@@ -37,6 +37,17 @@ export interface GoldTransaction {
   timestamp: Date;
 }
 
+export interface HomesteadBuilding {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  level: number;
+  baseCost: number;
+  bonusType: 'critical_chance' | 'daily_rush' | 'rested_xp' | 'better_bounties';
+  bonusValue: number;
+}
+
 export interface Player {
   name: string;
   level: number;
@@ -58,6 +69,9 @@ export interface Player {
   journeyProgress: number;
   questHistory: QuestHistory[];
   goldTransactions: GoldTransaction[];
+  homestead: HomesteadBuilding[];
+  dailyRushUsed: boolean;
+  restedXp: number;
 }
 
 export interface OracleMessage {
@@ -70,6 +84,13 @@ const LOOT_TABLE: LootItem[] = [
   { id: 'r1', name: 'Ring of Focus', type: 'xp_boost', value: 0.1, rarity: 'rare', icon: 'sparkles' },
   { id: 'a1', name: 'Amulet of Prosperity', type: 'gold_boost', value: 0.15, rarity: 'epic', icon: 'gem' },
   { id: 'c1', name: 'Crown of Champions', type: 'xp_boost', value: 0.2, rarity: 'legendary', icon: 'crown' },
+];
+
+const INITIAL_HOMESTEAD: HomesteadBuilding[] = [
+  { id: 'alchemist', name: "Alchemist's Hut", description: 'Transmutes effort into luck', icon: 'flask-conical', level: 0, baseCost: 100, bonusType: 'critical_chance', bonusValue: 0.05 },
+  { id: 'chrono', name: 'Chrono-Library', description: 'Bends time to your will', icon: 'clock', level: 0, baseCost: 150, bonusType: 'daily_rush', bonusValue: 1 },
+  { id: 'garden', name: 'Tranquil Garden', description: 'A place of rest and focus', icon: 'flower-2', level: 0, baseCost: 120, bonusType: 'rested_xp', bonusValue: 20 },
+  { id: 'guild', name: 'Guild Hall', description: 'Connects you to legends', icon: 'users', level: 0, baseCost: 200, bonusType: 'better_bounties', bonusValue: 1 },
 ];
 
 const ORACLE_MESSAGES = {
@@ -160,6 +181,9 @@ export const useGameState = () => {
       journeyProgress: 0,
       questHistory: [],
       goldTransactions: [],
+      homestead: INITIAL_HOMESTEAD,
+      dailyRushUsed: false,
+      restedXp: 0,
     };
   });
 
@@ -243,6 +267,7 @@ export const useGameState = () => {
   const calculateRewards = useCallback((quest: Quest) => {
     let xpBonus = 1;
     let goldBonus = 1;
+    let criticalSuccess = false;
 
     // Apply equipped item bonuses
     player.inventory.equipped.forEach(item => {
@@ -265,11 +290,25 @@ export const useGameState = () => {
     xpBonus *= prestigeBonus;
     goldBonus *= prestigeBonus;
 
-    const finalXp = Math.floor(quest.xp * xpBonus);
+    // Apply homestead bonuses
+    const alchemistLevel = player.homestead.find(b => b.id === 'alchemist')?.level || 0;
+    const critChance = alchemistLevel * 0.05;
+    if (Math.random() < critChance) {
+      criticalSuccess = true;
+      xpBonus *= 2;
+      goldBonus *= 2;
+    }
+
+    let finalXp = Math.floor(quest.xp * xpBonus);
     const finalGold = Math.floor((quest.xp / 10) * goldBonus);
 
-    return { xp: finalXp, gold: finalGold, xpBonus, goldBonus };
-  }, [player.inventory.equipped, player.prestigePoints, dailyFocus]);
+    // Apply rested XP bonus
+    if (player.restedXp > 0) {
+      finalXp += player.restedXp;
+    }
+
+    return { xp: finalXp, gold: finalGold, xpBonus, goldBonus, criticalSuccess };
+  }, [player.inventory.equipped, player.prestigePoints, dailyFocus, player.homestead, player.restedXp]);
 
   const addQuest = useCallback((quest: Omit<Quest, 'id' | 'completed' | 'createdAt'>) => {
     const newQuest: Quest = {
@@ -322,6 +361,7 @@ export const useGameState = () => {
         },
         skills: newSkills,
         journeyProgress: Math.min(prev.journeyProgress + 1, 10),
+        restedXp: 0, // Reset rested XP after use
       };
     });
 
@@ -377,7 +417,8 @@ export const useGameState = () => {
       showOracleMessage('firstQuest');
     }
 
-    toast.success(`Quest completed! +${rewards.xp} XP, +${rewards.gold} Gold`);
+    const critText = rewards.criticalSuccess ? ' 🎯 CRITICAL SUCCESS!' : '';
+    toast.success(`Quest completed! +${rewards.xp} XP, +${rewards.gold} Gold${critText}`);
   }, [quests, player, calculateRewards, showOracleMessage]);
 
   const equipItem = useCallback((item: LootItem) => {
@@ -433,6 +474,81 @@ export const useGameState = () => {
     return true;
   }, [player.gold]);
 
+  const upgradeBuilding = useCallback((buildingId: string) => {
+    const building = player.homestead.find(b => b.id === buildingId);
+    if (!building) return;
+
+    const cost = Math.floor(building.baseCost * Math.pow(1.5, building.level));
+    
+    if (!spendGold(cost, `Upgrade ${building.name}`)) return;
+
+    setPlayer(prev => ({
+      ...prev,
+      homestead: prev.homestead.map(b =>
+        b.id === buildingId ? { ...b, level: b.level + 1 } : b
+      )
+    }));
+
+    toast.success(`${building.name} upgraded to level ${building.level + 1}!`);
+  }, [player.homestead, spendGold]);
+
+  const rushQuest = useCallback((questId: string) => {
+    if (player.dailyRushUsed) {
+      toast.error('Daily rush already used today!');
+      return;
+    }
+
+    const chronoLevel = player.homestead.find(b => b.id === 'chrono')?.level || 0;
+    if (chronoLevel === 0) {
+      toast.error('Build the Chrono-Library first!');
+      return;
+    }
+
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return;
+
+    // Complete with 50% XP
+    const reducedQuest = { ...quest, xp: Math.floor(quest.xp * 0.5) };
+    const rewards = calculateRewards(reducedQuest);
+
+    setPlayer(prev => ({
+      ...prev,
+      xp: prev.xp + rewards.xp,
+      gold: prev.gold + rewards.gold,
+      stats: {
+        questsCompleted: prev.stats.questsCompleted + 1,
+        totalXp: prev.stats.totalXp + rewards.xp,
+      },
+      dailyRushUsed: true,
+    }));
+
+    setQuests(prev => prev.filter(q => q.id !== questId));
+    toast.success(`Quest rushed! +${rewards.xp} XP, +${rewards.gold} Gold ⚡`);
+  }, [player.dailyRushUsed, player.homestead, quests, calculateRewards]);
+
+  // Daily reset for rush and rested XP
+  useEffect(() => {
+    const lastReset = localStorage.getItem('questlog_last_reset');
+    const today = new Date().toDateString();
+    
+    if (lastReset !== today) {
+      const gardenLevel = player.homestead.find(b => b.id === 'garden')?.level || 0;
+      const restedXpAmount = gardenLevel * 20;
+
+      setPlayer(prev => ({
+        ...prev,
+        dailyRushUsed: false,
+        restedXp: restedXpAmount,
+      }));
+
+      localStorage.setItem('questlog_last_reset', today);
+      
+      if (restedXpAmount > 0) {
+        toast.success(`🌸 Rested XP: +${restedXpAmount} bonus on your next quest!`);
+      }
+    }
+  }, [player.homestead]);
+
   return {
     player,
     quests,
@@ -443,5 +559,7 @@ export const useGameState = () => {
     equipItem,
     unequipItem,
     spendGold,
+    upgradeBuilding,
+    rushQuest,
   };
 };

@@ -5,9 +5,11 @@ import { AddQuestForm } from "@/components/quest/AddQuestForm";
 import { JourneyMap } from "@/components/quest/JourneyMap";
 import { Armory } from "@/components/quest/Armory";
 import { Analytics } from "@/components/quest/Analytics";
+import { Homestead } from "@/components/quest/Homestead";
+import { AISage } from "@/components/quest/AISage";
 import { useGameState } from "@/hooks/useGameState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, BarChart3 } from "lucide-react";
+import { LayoutDashboard, BarChart3, Home } from "lucide-react";
 
 const Index = () => {
   const { 
@@ -18,7 +20,9 @@ const Index = () => {
     addQuest, 
     completeQuest,
     equipItem,
-    unequipItem
+    unequipItem,
+    upgradeBuilding,
+    rushQuest,
   } = useGameState();
 
   return (
@@ -39,10 +43,14 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3 mb-6">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="homestead" className="flex items-center gap-2">
+              <Home className="w-4 h-4" />
+              Homestead
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
@@ -66,14 +74,27 @@ const Index = () => {
 
               {/* Middle Column - Quests */}
               <div className="lg:col-span-2 space-y-6">
+                <AISage player={player} quests={quests} />
                 <AddQuestForm onAddQuest={addQuest} />
                 <QuestList 
                   quests={quests} 
                   dailyFocus={dailyFocus}
                   onCompleteQuest={completeQuest}
+                  onRushQuest={rushQuest}
+                  dailyRushUsed={player.dailyRushUsed}
+                  chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
                 />
               </div>
             </div>
+          </TabsContent>
+
+          {/* Homestead View */}
+          <TabsContent value="homestead">
+            <Homestead 
+              homestead={player.homestead}
+              gold={player.gold}
+              onUpgrade={upgradeBuilding}
+            />
           </TabsContent>
 
           {/* Analytics View */}

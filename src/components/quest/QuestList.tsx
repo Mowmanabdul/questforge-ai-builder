@@ -1,16 +1,19 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Flame } from "lucide-react";
+import { CheckCircle2, Flame, Zap } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 
 interface QuestListProps {
   quests: Quest[];
   dailyFocus: string;
   onCompleteQuest: (questId: string) => void;
+  onRushQuest?: (questId: string) => void;
+  dailyRushUsed?: boolean;
+  chronoLevel?: number;
 }
 
-export const QuestList = ({ quests, dailyFocus, onCompleteQuest }: QuestListProps) => {
+export const QuestList = ({ quests, dailyFocus, onCompleteQuest, onRushQuest, dailyRushUsed = false, chronoLevel = 0 }: QuestListProps) => {
   return (
     <Card className="glass-card p-6">
       <div className="mb-4">
@@ -60,14 +63,27 @@ export const QuestList = ({ quests, dailyFocus, onCompleteQuest }: QuestListProp
                     </span>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => onCompleteQuest(quest.id)}
-                  className="flex-shrink-0"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Complete
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => onCompleteQuest(quest.id)}
+                    className="flex-shrink-0"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Complete
+                  </Button>
+                  {onRushQuest && chronoLevel > 0 && !dailyRushUsed && (
+                    <Button
+                      size="sm"
+                      onClick={() => onRushQuest(quest.id)}
+                      variant="outline"
+                      className="flex-shrink-0"
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      Rush
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ))
