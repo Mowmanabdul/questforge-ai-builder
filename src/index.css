@@ -195,4 +195,44 @@
   .progress-glow {
     box-shadow: 0 0 10px hsl(var(--xp-bar) / 0.6), inset 0 0 10px hsl(var(--xp-bar) / 0.3);
   }
+
+  /* Enhanced Card Hover */
+  .card-hover {
+    transition: var(--transition-smooth);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-lg), 0 0 32px hsl(var(--primary) / 0.25);
+  }
+
+  /* Gradient Border Animation */
+  @keyframes borderGlow {
+    0%, 100% {
+      border-color: hsl(var(--primary) / 0.3);
+    }
+    50% {
+      border-color: hsl(var(--primary) / 0.7);
+    }
+  }
+
+  .border-glow {
+    animation: borderGlow 3s ease-in-out infinite;
+  }
+
+  /* Sparkle Effect */
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1) rotate(180deg);
+    }
+  }
+
+  .animate-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
+  }
 }
