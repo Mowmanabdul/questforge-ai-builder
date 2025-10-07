@@ -20,6 +20,23 @@ export interface LootItem {
   icon: string;
 }
 
+export interface QuestHistory {
+  id: string;
+  name: string;
+  category: string;
+  xp: number;
+  gold: number;
+  completedAt: Date;
+}
+
+export interface GoldTransaction {
+  id: string;
+  amount: number;
+  type: 'earned' | 'spent';
+  source: string;
+  timestamp: Date;
+}
+
 export interface Player {
   name: string;
   level: number;
@@ -39,6 +56,8 @@ export interface Player {
     stored: LootItem[];
   };
   journeyProgress: number;
+  questHistory: QuestHistory[];
+  goldTransactions: GoldTransaction[];
 }
 
 export interface OracleMessage {
@@ -115,7 +134,15 @@ export const useGameState = () => {
       const parsed = JSON.parse(saved);
       return {
         ...parsed,
-        inventory: parsed.inventory || { equipped: [], stored: [] }
+        inventory: parsed.inventory || { equipped: [], stored: [] },
+        questHistory: parsed.questHistory?.map((q: any) => ({
+          ...q,
+          completedAt: new Date(q.completedAt)
+        })) || [],
+        goldTransactions: parsed.goldTransactions?.map((t: any) => ({
+          ...t,
+          timestamp: new Date(t.timestamp)
+        })) || []
       };
     }
     return {
@@ -131,6 +158,8 @@ export const useGameState = () => {
       skills: {},
       inventory: { equipped: [], stored: [] },
       journeyProgress: 0,
+      questHistory: [],
+      goldTransactions: [],
     };
   });
 
@@ -296,6 +325,32 @@ export const useGameState = () => {
       };
     });
 
+    // Add to quest history and gold transaction
+    setPlayer(prev => {
+      const historyEntry: QuestHistory = {
+        id: `history-${Date.now()}`,
+        name: quest.name,
+        category: quest.category,
+        xp: rewards.xp,
+        gold: rewards.gold,
+        completedAt: new Date()
+      };
+
+      const goldTransaction: GoldTransaction = {
+        id: `trans-${Date.now()}`,
+        amount: rewards.gold,
+        type: 'earned',
+        source: `Quest: ${quest.name}`,
+        timestamp: new Date()
+      };
+
+      return {
+        ...prev,
+        questHistory: [...prev.questHistory, historyEntry],
+        goldTransactions: [...prev.goldTransactions, goldTransaction]
+      };
+    });
+
     // Roll for loot
     const loot = rollForLoot();
     if (loot) {
@@ -352,6 +407,32 @@ export const useGameState = () => {
     toast.success(`${item.name} unequipped!`);
   }, []);
 
+  const spendGold = useCallback((amount: number, purpose: string) => {
+    if (player.gold < amount) {
+      toast.error('Not enough gold!');
+      return false;
+    }
+
+    setPlayer(prev => {
+      const transaction: GoldTransaction = {
+        id: `trans-${Date.now()}`,
+        amount,
+        type: 'spent',
+        source: purpose,
+        timestamp: new Date()
+      };
+
+      return {
+        ...prev,
+        gold: prev.gold - amount,
+        goldTransactions: [...prev.goldTransactions, transaction]
+      };
+    });
+
+    toast.success(`Spent ${amount} gold on ${purpose}`);
+    return true;
+  }, [player.gold]);
+
   return {
     player,
     quests,
@@ -361,5 +442,6 @@ export const useGameState = () => {
     completeQuest,
     equipItem,
     unequipItem,
+    spendGold,
   };
 };
