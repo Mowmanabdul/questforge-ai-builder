@@ -2,10 +2,8 @@ import { OracleMessage } from "@/components/quest/OracleMessage";
 import { EnhancedQuestList } from "@/components/quest/EnhancedQuestList";
 import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
 import { Dashboard } from "@/components/quest/Dashboard";
-import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
-import { WeeklyInsights } from "@/components/quest/WeeklyInsights";
 import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
 import { GoalsTracker } from "@/components/quest/goals/GoalsTracker";
 import { QuestTemplates } from "@/components/quest/templates/QuestTemplates";
@@ -13,9 +11,12 @@ import { DailyChallenges } from "@/components/quest/challenges/DailyChallenges";
 import { PersonalRecords } from "@/components/quest/PersonalRecords";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
+import { Settings } from "@/components/quest/Settings";
 import { useGameState } from "@/hooks/useGameState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, Target, Gift, TrendingUp, Brain, Trophy, Sparkles } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Home, Target, TrendingUp, Brain, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 
@@ -29,15 +30,12 @@ const Index = () => {
     completeQuest,
     equipItem,
     unequipItem,
-    spendOnLeisure,
-    upgradeBuilding,
     rushQuest,
-    addCustomReward,
-    updateCustomReward,
-    deleteCustomReward,
+    resetAll,
   } = useGameState();
 
   const [selectedQuests, setSelectedQuests] = useState<string[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const handleSelectQuest = (questId: string) => {
     setSelectedQuests(prev => 
@@ -52,19 +50,11 @@ const Index = () => {
     setSelectedQuests([]);
   };
 
-  const handleExportJSON = () => {
-    exportToJSON(player, quests);
-  };
-
-  const handleExportCSV = () => {
-    exportToCSV(player, quests);
-  };
-
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
       <KeyboardShortcuts 
         onNewQuest={() => document.getElementById('questName')?.focus()}
-        onExportData={handleExportJSON}
+        onExportData={() => exportToJSON(player, quests)}
       />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -84,85 +74,76 @@ const Index = () => {
         {oracleMessage && <OracleMessage message={oracleMessage} />}
 
         {/* Navigation Tabs */}
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full max-w-6xl mx-auto grid-cols-3 lg:grid-cols-6 mb-6 glass-card">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+        <Tabs defaultValue="home" className="w-full">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4 lg:grid-cols-5 mb-6 glass-card">
+            <TabsTrigger value="home" className="flex items-center gap-2">
+              <Home className="w-4 h-4" />
+              <span className="hidden sm:inline">Home</span>
             </TabsTrigger>
             <TabsTrigger value="quests" className="flex items-center gap-2">
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Quests</span>
             </TabsTrigger>
-            <TabsTrigger value="rewards" className="flex items-center gap-2">
-              <Gift className="w-4 h-4" />
-              <span className="hidden sm:inline">Rewards</span>
-            </TabsTrigger>
             <TabsTrigger value="progress" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Progress</span>
-            </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
-              <Trophy className="w-4 h-4" />
-              <span className="hidden sm:inline">Achievements</span>
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
               <span className="hidden sm:inline">Insights</span>
             </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <SettingsIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Settings</span>
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dashboard">
+          <TabsContent value="home">
             <div className="space-y-6">
               <Dashboard player={player} quests={quests} dailyFocus={dailyFocus} />
+              <DailyChallenges challenges={[]} onClaim={() => {}} />
               <PersonalRecords records={player.personalRecords} />
             </div>
           </TabsContent>
 
-          <TabsContent value="quests">
-            <Tabs defaultValue="active" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="active">Active Quests</TabsTrigger>
-                <TabsTrigger value="templates">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Templates
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="active" className="space-y-6">
-                <EnhancedAddQuestForm onAddQuest={addQuest} />
-                <EnhancedQuestList 
-                  quests={quests} 
-                  dailyFocus={dailyFocus}
-                  onCompleteQuest={completeQuest}
-                  onRushQuest={rushQuest}
-                  dailyRushUsed={player.dailyRushUsed}
-                  chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
-                  selectedQuests={selectedQuests}
-                  onSelectQuest={handleSelectQuest}
-                  onBulkComplete={handleBulkComplete}
-                />
-              </TabsContent>
-              <TabsContent value="templates">
-                <QuestTemplates onUseTemplate={addQuest} />
-              </TabsContent>
-            </Tabs>
-          </TabsContent>
-
-          <TabsContent value="rewards">
-            <ImprovedRewards
-              gold={player.gold}
-              leisureHistory={player.leisureHistory}
-              customRewards={player.customRewards}
-              onSpendGold={spendOnLeisure}
-              onAddReward={addCustomReward}
-              onUpdateReward={updateCustomReward}
-              onDeleteReward={deleteCustomReward}
+          <TabsContent value="quests" className="space-y-6">
+            <div className="flex justify-end mb-4">
+              <Dialog open={showTemplates} onOpenChange={setShowTemplates}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Quest Templates
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Quest Templates</DialogTitle>
+                  </DialogHeader>
+                  <QuestTemplates onUseTemplate={(quest) => {
+                    addQuest(quest);
+                    setShowTemplates(false);
+                  }} />
+                </DialogContent>
+              </Dialog>
+            </div>
+            <EnhancedAddQuestForm onAddQuest={addQuest} />
+            <EnhancedQuestList 
+              quests={quests} 
+              dailyFocus={dailyFocus}
+              onCompleteQuest={completeQuest}
+              onRushQuest={rushQuest}
+              dailyRushUsed={player.dailyRushUsed}
+              chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
+              selectedQuests={selectedQuests}
+              onSelectQuest={handleSelectQuest}
+              onBulkComplete={handleBulkComplete}
             />
           </TabsContent>
 
           <TabsContent value="progress">
             <div className="space-y-6">
               <PlayerProgress player={player} onEquip={equipItem} onUnequip={unequipItem} />
+              <AchievementsGallery achievements={player.achievements} />
               <GoalsTracker 
                 goals={player.goals} 
                 onAddGoal={() => {}} 
@@ -171,23 +152,18 @@ const Index = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="achievements">
-            <AchievementsGallery achievements={player.achievements} />
+          <TabsContent value="insights">
+            <div className="space-y-6">
+              <ImprovedAnalytics player={player} />
+            </div>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-6">
-            <Tabs defaultValue="coach" className="w-full">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6">
-                <TabsTrigger value="coach">AI Coach</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              </TabsList>
-              <TabsContent value="coach">
-                <WeeklyInsights player={player} quests={quests} />
-              </TabsContent>
-              <TabsContent value="analytics">
-                <ImprovedAnalytics player={player} />
-              </TabsContent>
-            </Tabs>
+          <TabsContent value="settings">
+            <Settings 
+              onResetData={resetAll}
+              onExportJSON={() => exportToJSON(player, quests)}
+              onExportCSV={() => exportToCSV(player, quests)}
+            />
           </TabsContent>
         </Tabs>
       </div>

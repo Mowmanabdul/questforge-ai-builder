@@ -715,6 +715,13 @@ export const useGameState = () => {
     toast.success('Reward deleted');
   }, []);
 
+  const resetAll = () => {
+    localStorage.removeItem('gameState');
+    localStorage.removeItem('player');
+    localStorage.removeItem('quests');
+    window.location.reload();
+  };
+
   return {
     player,
     quests,
@@ -730,5 +737,6 @@ export const useGameState = () => {
     addCustomReward,
     updateCustomReward,
     deleteCustomReward,
+    resetAll,
   };
 };
