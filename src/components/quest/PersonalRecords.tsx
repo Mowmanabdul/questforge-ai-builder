@@ -11,10 +11,18 @@ interface PersonalRecordsProps {
 }
 
 export const PersonalRecords = ({ records }: PersonalRecordsProps) => {
+  // Provide fallback defaults in case records is undefined
+  const safeRecords = records || {
+    longestStreak: 0,
+    mostQuestsInDay: 0,
+    highestLevel: 1,
+    totalGoldEarned: 0,
+  };
+
   const recordsData = [
     {
       label: "Longest Streak",
-      value: `${records.longestStreak} days`,
+      value: `${safeRecords.longestStreak} days`,
       icon: Flame,
       color: "text-accent",
       bgColor: "bg-accent/10",
@@ -22,7 +30,7 @@ export const PersonalRecords = ({ records }: PersonalRecordsProps) => {
     },
     {
       label: "Most Quests (One Day)",
-      value: records.mostQuestsInDay,
+      value: safeRecords.mostQuestsInDay,
       icon: Zap,
       color: "text-leisure",
       bgColor: "bg-leisure/10",
@@ -30,7 +38,7 @@ export const PersonalRecords = ({ records }: PersonalRecordsProps) => {
     },
     {
       label: "Highest Level",
-      value: records.highestLevel,
+      value: safeRecords.highestLevel,
       icon: Trophy,
       color: "text-primary",
       bgColor: "bg-primary/10",
@@ -38,7 +46,7 @@ export const PersonalRecords = ({ records }: PersonalRecordsProps) => {
     },
     {
       label: "Total Gold Earned",
-      value: records.totalGoldEarned,
+      value: safeRecords.totalGoldEarned,
       icon: Coins,
       color: "text-gold",
       bgColor: "bg-gold/10",

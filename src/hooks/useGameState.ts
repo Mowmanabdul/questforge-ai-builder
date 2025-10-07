@@ -250,7 +250,20 @@ export const useGameState = () => {
         goldTransactions: parsed.goldTransactions?.map((t: any) => ({
           ...t,
           timestamp: new Date(t.timestamp)
-        })) || []
+        })) || [],
+        // Add defaults for new fields (for existing users)
+        achievements: parsed.achievements || [],
+        goals: parsed.goals || [],
+        personalRecords: parsed.personalRecords || {
+          longestStreak: 0,
+          mostQuestsInDay: 0,
+          highestLevel: 1,
+          totalGoldEarned: 0,
+        },
+        preferences: parsed.preferences || {
+          notifications: true,
+          tutorialCompleted: false,
+        },
       };
     }
     return {
