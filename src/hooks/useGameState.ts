@@ -8,6 +8,56 @@ export interface Quest {
   xp: number;
   completed: boolean;
   createdAt: Date;
+  dueDate?: Date;
+  priority?: 'low' | 'medium' | 'high';
+  recurring?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    lastCompleted?: Date;
+  };
+  isTemplate?: boolean;
+  chainId?: string;
+  chainOrder?: number;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt?: Date;
+  progress: number;
+  target: number;
+  category: 'quests' | 'streak' | 'xp' | 'gold' | 'special';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface Goal {
+  id: string;
+  name: string;
+  description: string;
+  target: number;
+  current: number;
+  type: 'quests' | 'category_quests' | 'xp' | 'gold' | 'streak';
+  category?: string;
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+export interface DailyChallenge {
+  id: string;
+  name: string;
+  description: string;
+  requirement: {
+    type: 'complete_quests' | 'earn_xp' | 'complete_category';
+    count: number;
+    category?: string;
+  };
+  reward: {
+    xp: number;
+    gold: number;
+  };
+  date: Date;
+  completed: boolean;
 }
 
 export interface LootItem {
@@ -85,6 +135,19 @@ export interface Player {
   restedXp: number;
   leisureHistory: Array<{ activityName: string; cost: number; timestamp: Date }>;
   customRewards: CustomReward[];
+  achievements: Achievement[];
+  goals: Goal[];
+  personalRecords: {
+    longestStreak: number;
+    mostQuestsInDay: number;
+    highestLevel: number;
+    totalGoldEarned: number;
+  };
+  preferences: {
+    theme?: 'dark' | 'light';
+    notifications: boolean;
+    tutorialCompleted: boolean;
+  };
 }
 
 export interface OracleMessage {
@@ -210,6 +273,18 @@ export const useGameState = () => {
       restedXp: 0,
       leisureHistory: [],
       customRewards: [],
+      achievements: [],
+      goals: [],
+      personalRecords: {
+        longestStreak: 0,
+        mostQuestsInDay: 0,
+        highestLevel: 1,
+        totalGoldEarned: 0,
+      },
+      preferences: {
+        notifications: true,
+        tutorialCompleted: false,
+      },
     };
   });
 
