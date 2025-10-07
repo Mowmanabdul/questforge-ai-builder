@@ -72,6 +72,7 @@ export interface Player {
   homestead: HomesteadBuilding[];
   dailyRushUsed: boolean;
   restedXp: number;
+  leisureHistory: Array<{ activityName: string; cost: number; timestamp: Date }>;
 }
 
 export interface OracleMessage {
@@ -159,6 +160,10 @@ export const useGameState = () => {
         homestead: parsed.homestead || INITIAL_HOMESTEAD,
         dailyRushUsed: parsed.dailyRushUsed || false,
         restedXp: parsed.restedXp || 0,
+        leisureHistory: parsed.leisureHistory?.map((l: any) => ({
+          ...l,
+          timestamp: new Date(l.timestamp)
+        })) || [],
         questHistory: parsed.questHistory?.map((q: any) => ({
           ...q,
           completedAt: new Date(q.completedAt)
@@ -187,6 +192,7 @@ export const useGameState = () => {
       homestead: INITIAL_HOMESTEAD,
       dailyRushUsed: false,
       restedXp: 0,
+      leisureHistory: [],
     };
   });
 
@@ -451,8 +457,8 @@ export const useGameState = () => {
     toast.success(`${item.name} unequipped!`);
   }, []);
 
-  const spendGold = useCallback((amount: number, purpose: string) => {
-    if (player.gold < amount) {
+  const spendOnLeisure = useCallback((activityId: string, activityName: string, cost: number) => {
+    if (player.gold < cost) {
       toast.error('Not enough gold!');
       return false;
     }
@@ -460,20 +466,26 @@ export const useGameState = () => {
     setPlayer(prev => {
       const transaction: GoldTransaction = {
         id: `trans-${Date.now()}`,
-        amount,
+        amount: -cost,
         type: 'spent',
-        source: purpose,
+        source: `Leisure: ${activityName}`,
+        timestamp: new Date()
+      };
+
+      const leisureEntry = {
+        activityName,
+        cost,
         timestamp: new Date()
       };
 
       return {
         ...prev,
-        gold: prev.gold - amount,
-        goldTransactions: [...prev.goldTransactions, transaction]
+        gold: prev.gold - cost,
+        goldTransactions: [...prev.goldTransactions, transaction],
+        leisureHistory: [...prev.leisureHistory, leisureEntry]
       };
     });
 
-    toast.success(`Spent ${amount} gold on ${purpose}`);
     return true;
   }, [player.gold]);
 
@@ -483,17 +495,32 @@ export const useGameState = () => {
 
     const cost = Math.floor(building.baseCost * Math.pow(1.5, building.level));
     
-    if (!spendGold(cost, `Upgrade ${building.name}`)) return;
+    if (player.gold < cost) {
+      toast.error('Not enough gold!');
+      return;
+    }
 
-    setPlayer(prev => ({
-      ...prev,
-      homestead: prev.homestead.map(b =>
-        b.id === buildingId ? { ...b, level: b.level + 1 } : b
-      )
-    }));
+    setPlayer(prev => {
+      const transaction: GoldTransaction = {
+        id: `trans-${Date.now()}`,
+        amount: -cost,
+        type: 'spent',
+        source: `Upgrade ${building.name}`,
+        timestamp: new Date()
+      };
+
+      return {
+        ...prev,
+        gold: prev.gold - cost,
+        goldTransactions: [...prev.goldTransactions, transaction],
+        homestead: prev.homestead.map(b =>
+          b.id === buildingId ? { ...b, level: b.level + 1 } : b
+        )
+      };
+    });
 
     toast.success(`${building.name} upgraded to level ${building.level + 1}!`);
-  }, [player.homestead, spendGold]);
+  }, [player.homestead, player.gold]);
 
   const rushQuest = useCallback((questId: string) => {
     if (player.dailyRushUsed) {
@@ -561,7 +588,7 @@ export const useGameState = () => {
     completeQuest,
     equipItem,
     unequipItem,
-    spendGold,
+    spendOnLeisure,
     upgradeBuilding,
     rushQuest,
   };
