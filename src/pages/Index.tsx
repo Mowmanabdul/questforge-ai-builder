@@ -1,15 +1,13 @@
-import { DashboardStats } from "@/components/quest/DashboardStats";
 import { OracleMessage } from "@/components/quest/OracleMessage";
 import { QuestList } from "@/components/quest/QuestList";
 import { AddQuestForm } from "@/components/quest/AddQuestForm";
-import { JourneyMap } from "@/components/quest/JourneyMap";
-import { Armory } from "@/components/quest/Armory";
+import { RewardsManager } from "@/components/quest/RewardsManager";
+import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { AnalyticsCharts } from "@/components/quest/AnalyticsCharts";
-import { LeisureRewards } from "@/components/quest/LeisureRewards";
 import { WeeklyInsights } from "@/components/quest/WeeklyInsights";
 import { useGameState } from "@/hooks/useGameState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, BarChart3, Sparkles } from "lucide-react";
+import { Target, Gift, TrendingUp, Brain } from "lucide-react";
 
 const Index = () => {
   const { 
@@ -24,6 +22,9 @@ const Index = () => {
     spendOnLeisure,
     upgradeBuilding,
     rushQuest,
+    addCustomReward,
+    updateCustomReward,
+    deleteCustomReward,
   } = useGameState();
 
   return (
@@ -43,64 +44,64 @@ const Index = () => {
         )}
 
         {/* Navigation Tabs */}
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3 mb-6 glass-card">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+        <Tabs defaultValue="quests" className="w-full">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 mb-6 glass-card">
+            <TabsTrigger value="quests" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">Quests</span>
             </TabsTrigger>
-            <TabsTrigger value="leisure" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Leisure</span>
+            <TabsTrigger value="rewards" className="flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              <span className="hidden sm:inline">Rewards</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Analytics</span>
+            <TabsTrigger value="progress" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              <span className="hidden sm:inline">Progress</span>
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              <span className="hidden sm:inline">Insights</span>
             </TabsTrigger>
           </TabsList>
 
-          {/* Dashboard View */}
-          <TabsContent value="dashboard" className="space-y-6">
-            <WeeklyInsights player={player} quests={quests} />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Player Stats & Journey */}
-              <div className="space-y-6">
-                <DashboardStats player={player} />
-                <JourneyMap player={player} />
-                <Armory 
-                  inventory={player.inventory} 
-                  onEquip={equipItem}
-                  onUnequip={unequipItem}
-                />
-              </div>
-
-              {/* Right Column - Quests */}
-              <div className="lg:col-span-2 space-y-6">
-                <AddQuestForm onAddQuest={addQuest} />
-                <QuestList 
-                  quests={quests} 
-                  dailyFocus={dailyFocus}
-                  onCompleteQuest={completeQuest}
-                  onRushQuest={rushQuest}
-                  dailyRushUsed={player.dailyRushUsed}
-                  chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Leisure & Rewards View */}
-          <TabsContent value="leisure">
-            <LeisureRewards
-              gold={player.gold}
-              leisureHistory={player.leisureHistory}
-              onSpendGold={spendOnLeisure}
+          {/* Quests Tab */}
+          <TabsContent value="quests" className="space-y-6">
+            <AddQuestForm onAddQuest={addQuest} />
+            <QuestList 
+              quests={quests} 
+              dailyFocus={dailyFocus}
+              onCompleteQuest={completeQuest}
+              onRushQuest={rushQuest}
+              dailyRushUsed={player.dailyRushUsed}
+              chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
             />
           </TabsContent>
 
-          {/* Analytics View */}
-          <TabsContent value="analytics">
+          {/* Rewards Tab */}
+          <TabsContent value="rewards">
+            <RewardsManager
+              gold={player.gold}
+              leisureHistory={player.leisureHistory}
+              customRewards={player.customRewards}
+              onSpendGold={spendOnLeisure}
+              onAddReward={addCustomReward}
+              onUpdateReward={updateCustomReward}
+              onDeleteReward={deleteCustomReward}
+            />
+          </TabsContent>
+
+          {/* Progress Tab */}
+          <TabsContent value="progress">
+            <PlayerProgress
+              player={player}
+              onEquip={equipItem}
+              onUnequip={unequipItem}
+            />
+          </TabsContent>
+
+          {/* Insights Tab */}
+          <TabsContent value="insights" className="space-y-6">
+            <WeeklyInsights player={player} quests={quests} />
             <AnalyticsCharts player={player} />
           </TabsContent>
         </Tabs>

@@ -48,6 +48,16 @@ export interface HomesteadBuilding {
   bonusValue: number;
 }
 
+export interface CustomReward {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  icon: string;
+  emoji: string;
+  createdAt: Date;
+}
+
 export interface Player {
   name: string;
   level: number;
@@ -73,6 +83,7 @@ export interface Player {
   dailyRushUsed: boolean;
   restedXp: number;
   leisureHistory: Array<{ activityName: string; cost: number; timestamp: Date }>;
+  customRewards: CustomReward[];
 }
 
 export interface OracleMessage {
@@ -160,6 +171,10 @@ export const useGameState = () => {
         homestead: parsed.homestead || INITIAL_HOMESTEAD,
         dailyRushUsed: parsed.dailyRushUsed || false,
         restedXp: parsed.restedXp || 0,
+        customRewards: parsed.customRewards?.map((r: any) => ({
+          ...r,
+          createdAt: new Date(r.createdAt)
+        })) || [],
         leisureHistory: parsed.leisureHistory?.map((l: any) => ({
           ...l,
           timestamp: new Date(l.timestamp)
@@ -193,6 +208,7 @@ export const useGameState = () => {
       dailyRushUsed: false,
       restedXp: 0,
       leisureHistory: [],
+      customRewards: [],
     };
   });
 
@@ -579,6 +595,37 @@ export const useGameState = () => {
     }
   }, [player.homestead]);
 
+  const addCustomReward = useCallback((reward: Omit<CustomReward, 'id' | 'createdAt'>) => {
+    const newReward: CustomReward = {
+      ...reward,
+      id: `reward-${Date.now()}`,
+      createdAt: new Date(),
+    };
+    setPlayer(prev => ({
+      ...prev,
+      customRewards: [...prev.customRewards, newReward]
+    }));
+    toast.success(`Reward "${reward.name}" created!`);
+  }, []);
+
+  const updateCustomReward = useCallback((rewardId: string, updates: Partial<CustomReward>) => {
+    setPlayer(prev => ({
+      ...prev,
+      customRewards: prev.customRewards.map(r =>
+        r.id === rewardId ? { ...r, ...updates } : r
+      )
+    }));
+    toast.success('Reward updated!');
+  }, []);
+
+  const deleteCustomReward = useCallback((rewardId: string) => {
+    setPlayer(prev => ({
+      ...prev,
+      customRewards: prev.customRewards.filter(r => r.id !== rewardId)
+    }));
+    toast.success('Reward deleted');
+  }, []);
+
   return {
     player,
     quests,
@@ -591,5 +638,8 @@ export const useGameState = () => {
     spendOnLeisure,
     upgradeBuilding,
     rushQuest,
+    addCustomReward,
+    updateCustomReward,
+    deleteCustomReward,
   };
 };
