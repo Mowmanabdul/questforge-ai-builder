@@ -1,13 +1,14 @@
 import { OracleMessage } from "@/components/quest/OracleMessage";
 import { QuestList } from "@/components/quest/QuestList";
 import { AddQuestForm } from "@/components/quest/AddQuestForm";
-import { RewardsManager } from "@/components/quest/RewardsManager";
+import { Dashboard } from "@/components/quest/Dashboard";
+import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { PlayerProgress } from "@/components/quest/PlayerProgress";
-import { AnalyticsCharts } from "@/components/quest/AnalyticsCharts";
+import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { WeeklyInsights } from "@/components/quest/WeeklyInsights";
 import { useGameState } from "@/hooks/useGameState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target, Gift, TrendingUp, Brain } from "lucide-react";
+import { LayoutDashboard, Target, Gift, TrendingUp, Brain } from "lucide-react";
 
 const Index = () => {
   const { 
@@ -44,8 +45,12 @@ const Index = () => {
         )}
 
         {/* Navigation Tabs */}
-        <Tabs defaultValue="quests" className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 mb-6 glass-card">
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-5 mb-6 glass-card">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <LayoutDashboard className="w-4 h-4" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </TabsTrigger>
             <TabsTrigger value="quests" className="flex items-center gap-2">
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Quests</span>
@@ -64,6 +69,15 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
+          {/* Dashboard Tab */}
+          <TabsContent value="dashboard">
+            <Dashboard 
+              player={player}
+              quests={quests}
+              dailyFocus={dailyFocus}
+            />
+          </TabsContent>
+
           {/* Quests Tab */}
           <TabsContent value="quests" className="space-y-6">
             <AddQuestForm onAddQuest={addQuest} />
@@ -79,7 +93,7 @@ const Index = () => {
 
           {/* Rewards Tab */}
           <TabsContent value="rewards">
-            <RewardsManager
+            <ImprovedRewards
               gold={player.gold}
               leisureHistory={player.leisureHistory}
               customRewards={player.customRewards}
@@ -101,8 +115,18 @@ const Index = () => {
 
           {/* Insights Tab */}
           <TabsContent value="insights" className="space-y-6">
-            <WeeklyInsights player={player} quests={quests} />
-            <AnalyticsCharts player={player} />
+            <Tabs defaultValue="coach" className="w-full">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6">
+                <TabsTrigger value="coach">AI Coach</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              </TabsList>
+              <TabsContent value="coach">
+                <WeeklyInsights player={player} quests={quests} />
+              </TabsContent>
+              <TabsContent value="analytics">
+                <ImprovedAnalytics player={player} />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>

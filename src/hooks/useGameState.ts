@@ -55,6 +55,7 @@ export interface CustomReward {
   cost: number;
   icon: string;
   emoji: string;
+  category?: string;
   createdAt: Date;
 }
 

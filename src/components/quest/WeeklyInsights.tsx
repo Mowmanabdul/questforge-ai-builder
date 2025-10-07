@@ -100,62 +100,84 @@ export const WeeklyInsights = ({ player, quests }: WeeklyInsightsProps) => {
   };
 
   return (
-    <Card className="glass-card border-insight/30 glow-primary">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-insight/10">
-              <Sparkles className="w-6 h-6 text-insight" />
+    <div className="space-y-6 animate-fade-in">
+      <Card className="glass-card border-insight/30">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-lg bg-insight/10">
+                <Sparkles className="w-8 h-8 text-insight" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">AI Performance Coach</CardTitle>
+                <CardDescription className="text-base mt-1">
+                  Get personalized insights and recommendations
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-xl">AI Weekly Insights</CardTitle>
-              <CardDescription>Your personalized performance coach</CardDescription>
+            <Button
+              onClick={generateInsights}
+              disabled={loading || player.questHistory?.length === 0}
+              size="lg"
+              className="gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <RefreshCw className="w-5 h-5" />
+              )}
+              {insights ? 'Get New Insights' : 'Generate Insights'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center space-y-4">
+                <Loader2 className="w-12 h-12 animate-spin mx-auto text-insight" />
+                <div>
+                  <p className="text-base font-medium">Analyzing your journey...</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    This may take a few moments
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          <Button
-            onClick={generateInsights}
-            disabled={loading || player.questHistory?.length === 0}
-            variant="outline"
-            size="sm"
-            className="border-insight/50 hover:bg-insight/10"
-          >
-            {loading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4 mr-2" />
-            )}
-            {insights ? 'Refresh' : 'Generate'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="text-center space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-insight" />
-              <p className="text-sm text-muted-foreground">Analyzing your journey...</p>
+          ) : insights ? (
+            <div className="space-y-4">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-insight/10 to-primary/5 border border-insight/20">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{insights}</p>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Sparkles className="w-3 h-3" />
+                <span>Powered by AI • Free during beta</span>
+              </div>
             </div>
-          </div>
-        ) : insights ? (
-          <div className="p-4 rounded-lg bg-muted/30 border border-insight/20">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{insights}</p>
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <Sparkles className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground mb-4">
-              {player.questHistory?.length === 0 
-                ? "Complete some quests first to get AI-powered insights about your progress!"
-                : "Click the button above to get personalized insights about your weekly performance."}
-            </p>
-            {player.questHistory?.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                💡 Free while using Gemini models (until Oct 13)
+          ) : (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-insight/10 mb-4">
+                <Sparkles className="w-10 h-10 text-insight" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                {player.questHistory?.length === 0 
+                  ? "Start Your Journey"
+                  : "Ready to Unlock Insights"}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                {player.questHistory?.length === 0 
+                  ? "Complete some quests to unlock personalized AI insights about your progress, patterns, and areas for improvement."
+                  : "Click the button above to get AI-powered analysis of your weekly performance, personalized recommendations, and actionable tips."}
               </p>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              {player.questHistory?.length > 0 && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  <span>Free while using Gemini models (until Oct 13)</span>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
