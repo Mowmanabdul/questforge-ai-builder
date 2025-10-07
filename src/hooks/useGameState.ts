@@ -156,6 +156,9 @@ export const useGameState = () => {
       return {
         ...parsed,
         inventory: parsed.inventory || { equipped: [], stored: [] },
+        homestead: parsed.homestead || INITIAL_HOMESTEAD,
+        dailyRushUsed: parsed.dailyRushUsed || false,
+        restedXp: parsed.restedXp || 0,
         questHistory: parsed.questHistory?.map((q: any) => ({
           ...q,
           completedAt: new Date(q.completedAt)
