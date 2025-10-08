@@ -6,13 +6,14 @@ import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
+import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
 import { Settings } from "@/components/quest/Settings";
 import { useGameState } from "@/hooks/useGameState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Home, Target, TrendingUp, Settings as SettingsIcon } from "lucide-react";
+import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 
@@ -22,11 +23,16 @@ const Index = () => {
     quests, 
     dailyFocus,
     oracleMessage,
-    addQuest, 
+    addQuest,
+    deleteQuest,
     completeQuest,
     equipItem,
     unequipItem,
     rushQuest,
+    spendOnLeisure,
+    addCustomReward,
+    updateCustomReward,
+    deleteCustomReward,
     resetAll,
   } = useGameState();
 
@@ -94,7 +100,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full max-w-xl mx-auto grid-cols-3 mb-8 glass-card p-1">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 mb-8 glass-card p-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -110,11 +116,25 @@ const Index = () => {
               <span className="hidden sm:inline">Quests</span>
             </TabsTrigger>
             <TabsTrigger 
+              value="rewards" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden sm:inline">Rewards</span>
+            </TabsTrigger>
+            <TabsTrigger 
               value="progress" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Progress</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analytics" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
           </TabsList>
 
@@ -131,6 +151,7 @@ const Index = () => {
               quests={quests} 
               dailyFocus={dailyFocus}
               onCompleteQuest={completeQuest}
+              onDeleteQuest={deleteQuest}
               onRushQuest={rushQuest}
               dailyRushUsed={player.dailyRushUsed}
               chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
@@ -140,12 +161,27 @@ const Index = () => {
             />
           </TabsContent>
 
+          <TabsContent value="rewards">
+            <ImprovedRewards
+              gold={player.gold}
+              leisureHistory={player.leisureHistory}
+              customRewards={player.customRewards}
+              onSpendGold={spendOnLeisure}
+              onAddReward={addCustomReward}
+              onUpdateReward={updateCustomReward}
+              onDeleteReward={deleteCustomReward}
+            />
+          </TabsContent>
+
           <TabsContent value="progress">
             <div className="space-y-6">
               <PlayerProgress player={player} onEquip={equipItem} onUnequip={unequipItem} />
               <AchievementsGallery achievements={player.achievements} />
-              <ImprovedAnalytics player={player} />
             </div>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <ImprovedAnalytics player={player} />
           </TabsContent>
         </Tabs>
       </div>

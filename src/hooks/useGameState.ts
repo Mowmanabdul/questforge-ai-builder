@@ -435,6 +435,14 @@ export const useGameState = () => {
     toast.success(`Quest "${quest.name}" added!`);
   }, []);
 
+  const deleteQuest = useCallback((questId: string) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return;
+    
+    setQuests(prev => prev.filter(q => q.id !== questId));
+    toast.success(`Quest "${quest.name}" deleted`);
+  }, [quests]);
+
   const completeQuest = useCallback((questId: string) => {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return;
@@ -728,6 +736,7 @@ export const useGameState = () => {
     dailyFocus,
     oracleMessage,
     addQuest,
+    deleteQuest,
     completeQuest,
     equipItem,
     unequipItem,

@@ -43,7 +43,7 @@ export const DashboardStats = ({ player }: DashboardStatsProps) => {
         </div>
 
         <div className="glass-card p-4 rounded-lg text-center">
-          <Flame className="w-6 h-6 text-[hsl(var(--streak))] mx-auto mb-2" />
+          <Flame className="w-6 h-6 text-accent mx-auto mb-2" />
           <div className="text-2xl font-bold">{player.streak}</div>
           <div className="text-xs text-muted-foreground">Day Streak</div>
         </div>
