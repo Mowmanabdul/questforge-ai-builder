@@ -10,12 +10,8 @@ import {
   Flame, 
   Zap, 
   Search, 
-  Filter, 
-  Calendar,
-  AlertCircle,
-  Edit,
-  Trash2,
-  RotateCcw
+  Filter,
+  Trash2
 } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 import { format } from "date-fns";
@@ -26,7 +22,6 @@ interface EnhancedQuestListProps {
   onCompleteQuest: (questId: string) => void;
   onRushQuest?: (questId: string) => void;
   onDeleteQuest?: (questId: string) => void;
-  onEditQuest?: (questId: string) => void;
   dailyRushUsed?: boolean;
   chronoLevel?: number;
   selectedQuests?: string[];
@@ -40,7 +35,6 @@ export const EnhancedQuestList = ({
   onCompleteQuest,
   onRushQuest,
   onDeleteQuest,
-  onEditQuest,
   dailyRushUsed = false,
   chronoLevel = 0,
   selectedQuests = [],
@@ -65,23 +59,12 @@ export const EnhancedQuestList = ({
     return matchesSearch && matchesCategory && matchesPriority;
   });
 
-  // Sort quests: priority (high first), then due date (soon first)
+  // Sort quests: priority (high first)
   const sortedQuests = [...filteredQuests].sort((a, b) => {
-    // Priority sorting
     const priorityOrder = { high: 3, medium: 2, low: 1 };
     const aPriority = priorityOrder[a.priority || 'medium'];
     const bPriority = priorityOrder[b.priority || 'medium'];
-    
-    if (aPriority !== bPriority) return bPriority - aPriority;
-    
-    // Due date sorting
-    if (a.dueDate && b.dueDate) {
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-    }
-    if (a.dueDate) return -1;
-    if (b.dueDate) return 1;
-    
-    return 0;
+    return bPriority - aPriority;
   });
 
   const getPriorityColor = (priority?: string) => {
@@ -93,10 +76,6 @@ export const EnhancedQuestList = ({
     }
   };
 
-  const getDaysUntilDue = (dueDate: Date) => {
-    const days = Math.ceil((new Date(dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-    return days;
-  };
 
   return (
     <Card className="glass-card p-6">
@@ -208,17 +187,12 @@ export const EnhancedQuestList = ({
             </p>
           </div>
         ) : (
-          sortedQuests.map((quest) => {
-            const daysUntil = quest.dueDate ? getDaysUntilDue(quest.dueDate) : null;
-            const isOverdue = daysUntil !== null && daysUntil < 0;
-            const isDueSoon = daysUntil !== null && daysUntil >= 0 && daysUntil <= 2;
-
-            return (
+          sortedQuests.map((quest) => (
               <div
                 key={quest.id}
                 className={`glass-card p-4 rounded-lg transition-all hover:border-primary/50 ${
                   quest.category === dailyFocus ? 'border-primary/30 glow-primary' : ''
-                } ${isOverdue ? 'border-destructive/30' : ''}`}
+                }`}
               >
                 <div className="flex items-start gap-4">
                   {onSelectQuest && (
@@ -234,12 +208,6 @@ export const EnhancedQuestList = ({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <h3 className="font-semibold">{quest.name}</h3>
-                          {quest.recurring && (
-                            <Badge variant="outline" className="text-xs">
-                              <RotateCcw className="w-3 h-3 mr-1" />
-                              {quest.recurring.frequency}
-                            </Badge>
-                          )}
                           {quest.category === dailyFocus && (
                             <Flame className="w-4 h-4 text-primary" />
                           )}
@@ -259,41 +227,12 @@ export const EnhancedQuestList = ({
                               <span className="text-primary ml-1">(+25%)</span>
                             )}
                           </span>
-                          {quest.dueDate && (
-                            <Badge 
-                              variant="outline" 
-                              className={`text-xs ${
-                                isOverdue 
-                                  ? 'border-destructive text-destructive' 
-                                  : isDueSoon 
-                                  ? 'border-accent text-accent'
-                                  : ''
-                              }`}
-                            >
-                              <Calendar className="w-3 h-3 mr-1" />
-                              {isOverdue 
-                                ? `Overdue ${Math.abs(daysUntil)} days` 
-                                : daysUntil === 0
-                                ? 'Due today'
-                                : `Due in ${daysUntil} days`
-                              }
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex gap-2 flex-shrink-0">
-                    {onEditQuest && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => onEditQuest(quest.id)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    )}
                     {onDeleteQuest && (
                       <Button
                         size="icon"
@@ -324,8 +263,7 @@ export const EnhancedQuestList = ({
                   </div>
                 </div>
               </div>
-            );
-          })
+            ))
         )}
       </div>
     </Card>

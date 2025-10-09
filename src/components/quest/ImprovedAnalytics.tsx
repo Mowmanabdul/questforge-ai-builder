@@ -20,12 +20,12 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
     .slice(0, 6);
 
   const COLORS = [
-    'hsl(267, 84%, 64%)', // primary
-    'hsl(43, 96%, 56%)', // gold
-    'hsl(142, 71%, 45%)', // accent
-    'hsl(330, 81%, 60%)', // leisure
-    'hsl(190, 95%, 56%)', // insight
-    'hsl(240, 6%, 60%)', // muted
+    'hsl(var(--primary))',
+    'hsl(var(--gold))',
+    'hsl(var(--accent))',
+    'hsl(var(--leisure))',
+    'hsl(var(--insight))',
+    'hsl(var(--muted))',
   ];
 
   // Gold flow data
@@ -40,9 +40,9 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
   );
 
   const goldFlowData = [
-    { name: 'Earned', value: goldEarned, fill: 'hsl(43, 96%, 56%)' },
-    { name: 'Spent', value: goldSpent, fill: 'hsl(330, 81%, 60%)' },
-    { name: 'Current', value: player.gold, fill: 'hsl(267, 84%, 64%)' },
+    { name: 'Earned', value: goldEarned, fill: 'hsl(var(--gold))' },
+    { name: 'Spent', value: goldSpent, fill: 'hsl(var(--leisure))' },
+    { name: 'Current', value: player.gold, fill: 'hsl(var(--primary))' },
   ];
 
   // XP progress over last 7 days
@@ -165,7 +165,7 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                         <Line 
                           type="monotone" 
                           dataKey="quests" 
-                          stroke="hsl(267, 84%, 64%)" 
+                          stroke="hsl(var(--primary))" 
                           strokeWidth={2}
                           name="Quests Completed"
                         />
@@ -208,8 +208,8 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                           }} 
                         />
                         <Legend />
-                        <Bar dataKey="xp" fill="hsl(267, 84%, 64%)" radius={[8, 8, 0, 0]} name="XP Earned" />
-                        <Bar dataKey="quests" fill="hsl(142, 71%, 45%)" radius={[8, 8, 0, 0]} name="Quests Done" />
+                        <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} name="XP Earned" />
+                        <Bar dataKey="quests" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} name="Quests Done" />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
