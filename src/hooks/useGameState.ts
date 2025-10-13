@@ -8,6 +8,8 @@ export interface Quest {
   xp: number;
   completed: boolean;
   createdAt: Date;
+  completedAt?: Date;
+  description?: string;
   dueDate?: Date;
   priority?: 'low' | 'medium' | 'high';
   recurring?: {

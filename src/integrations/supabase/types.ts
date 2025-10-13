@@ -437,6 +437,7 @@ export type Database = {
           completed: boolean
           completed_at: string | null
           created_at: string
+          description: string | null
           id: string
           is_template: boolean
           name: string
@@ -451,6 +452,7 @@ export type Database = {
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_template?: boolean
           name: string
@@ -465,6 +467,7 @@ export type Database = {
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_template?: boolean
           name?: string

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle } from "lucide-react";
@@ -14,6 +15,7 @@ interface EnhancedAddQuestFormProps {
 
 export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) => {
   const [questName, setQuestName] = useState("");
+  const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Work");
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
 
@@ -29,6 +31,7 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
 
     onAddQuest({
       name: questName,
+      description: description || undefined,
       category,
       xp: xpByPriority[priority],
       priority,
@@ -36,6 +39,7 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
 
     // Reset form
     setQuestName("");
+    setDescription("");
     setPriority('medium');
   };
 
@@ -47,18 +51,30 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-1 space-y-2">
-              <Label htmlFor="questName">Quest Name</Label>
-              <Input
-                id="questName"
-                placeholder="What do you want to accomplish?"
-                value={questName}
-                onChange={(e) => setQuestName(e.target.value)}
-                className="bg-background/50"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="questName">Quest Name</Label>
+            <Input
+              id="questName"
+              placeholder="What do you want to accomplish?"
+              value={questName}
+              onChange={(e) => setQuestName(e.target.value)}
+              className="bg-background/50"
+            />
+          </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Add details about this quest..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-background/50"
+              rows={2}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Select value={category} onValueChange={setCategory}>

@@ -11,7 +11,8 @@ import {
   Zap, 
   Search, 
   Filter,
-  Trash2
+  Trash2,
+  Edit2
 } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 import { format } from "date-fns";
@@ -22,6 +23,7 @@ interface EnhancedQuestListProps {
   onCompleteQuest: (questId: string) => void;
   onRushQuest?: (questId: string) => void;
   onDeleteQuest?: (questId: string) => void;
+  onEditQuest?: (questId: string) => void;
   dailyRushUsed?: boolean;
   chronoLevel?: number;
   selectedQuests?: string[];
@@ -35,6 +37,7 @@ export const EnhancedQuestList = ({
   onCompleteQuest,
   onRushQuest,
   onDeleteQuest,
+  onEditQuest,
   dailyRushUsed = false,
   chronoLevel = 0,
   selectedQuests = [],
@@ -212,6 +215,9 @@ export const EnhancedQuestList = ({
                             <Flame className="w-4 h-4 text-primary" />
                           )}
                         </div>
+                        {quest.description && (
+                          <p className="text-sm text-muted-foreground mb-2">{quest.description}</p>
+                        )}
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge variant="outline" className="text-xs">
                             {quest.category}
@@ -233,6 +239,15 @@ export const EnhancedQuestList = ({
                   </div>
 
                   <div className="flex gap-2 flex-shrink-0">
+                    {onEditQuest && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => onEditQuest(quest.id)}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                    )}
                     {onDeleteQuest && (
                       <Button
                         size="icon"

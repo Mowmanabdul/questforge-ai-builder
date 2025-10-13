@@ -6,6 +6,7 @@ import { Quest, Player, OracleMessage } from "./useGameState";
 export const useSupabaseGameState = (userId: string | undefined) => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [quests, setQuests] = useState<Quest[]>([]);
+  const [completedQuests, setCompletedQuests] = useState<Quest[]>([]);
   const [loading, setLoading] = useState(true);
   const [oracleMessage, setOracleMessage] = useState<OracleMessage | null>(null);
 
@@ -229,7 +230,9 @@ export const useSupabaseGameState = (userId: string | undefined) => {
         category: q.category,
         xp: q.xp,
         completed: q.completed,
+        completedAt: q.completed_at ? new Date(q.completed_at) : undefined,
         createdAt: new Date(q.created_at),
+        description: q.description || undefined,
         priority: q.priority as any,
         isTemplate: q.is_template,
         chainId: q.chain_id,
@@ -243,16 +246,54 @@ export const useSupabaseGameState = (userId: string | undefined) => {
     }
   }, [userId]);
 
+  // Load completed quests
+  const loadCompletedQuests = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('quests')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('completed', true)
+        .order('completed_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      const questsData: Quest[] = data.map(q => ({
+        id: q.id,
+        name: q.name,
+        category: q.category,
+        xp: q.xp,
+        completed: q.completed,
+        completedAt: q.completed_at ? new Date(q.completed_at) : undefined,
+        createdAt: new Date(q.created_at),
+        description: q.description || undefined,
+        priority: q.priority as any,
+        isTemplate: q.is_template,
+        chainId: q.chain_id,
+        chainOrder: q.chain_order,
+      }));
+
+      setCompletedQuests(questsData);
+    } catch (error: any) {
+      console.error('Error loading completed quests:', error);
+      toast.error('Failed to load completed quests');
+    }
+  }, [userId]);
+
   // Initial load
   useEffect(() => {
     if (userId) {
-      Promise.all([loadPlayerData(), loadQuests()]).finally(() => setLoading(false));
+      Promise.all([loadPlayerData(), loadQuests(), loadCompletedQuests()]).finally(() => setLoading(false));
     }
-  }, [userId, loadPlayerData, loadQuests]);
+  }, [userId, loadPlayerData, loadQuests, loadCompletedQuests]);
 
   return {
     player,
     quests,
+    completedQuests,
     loading,
     oracleMessage,
     setOracleMessage,
@@ -260,5 +301,6 @@ export const useSupabaseGameState = (userId: string | undefined) => {
     setQuests,
     loadPlayerData,
     loadQuests,
+    loadCompletedQuests,
   };
 };

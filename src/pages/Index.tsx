@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { OracleMessage } from "@/components/quest/OracleMessage";
 import { EnhancedQuestList } from "@/components/quest/EnhancedQuestList";
 import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
+import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
+import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
 import { Dashboard } from "@/components/quest/Dashboard";
 import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
@@ -16,8 +18,9 @@ import { useSupabaseGameState } from "@/hooks/useSupabaseGameState";
 import { useLocalStorageSync } from "@/hooks/useLocalStorageSync";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2 } from "lucide-react";
+import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive } from "lucide-react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,10 +29,12 @@ import { toast } from "sonner";
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
-  const { player, quests, loading: dataLoading, oracleMessage, setPlayer, setQuests, loadPlayerData, loadQuests } = useSupabaseGameState(user?.id);
+  const { player, quests, completedQuests, loading: dataLoading, oracleMessage, setPlayer, setQuests, loadPlayerData, loadQuests, loadCompletedQuests } = useSupabaseGameState(user?.id);
   const { syncing } = useLocalStorageSync(user?.id);
   const [selectedQuests, setSelectedQuests] = useState<string[]>([]);
   const [dailyFocus, setDailyFocus] = useState<string>("");
+  const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+  const [deleteConfirmQuest, setDeleteConfirmQuest] = useState<string | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -74,6 +79,7 @@ const Index = () => {
       const { data, error } = await supabase.from('quests').insert({
         user_id: user.id,
         name: quest.name,
+        description: quest.description,
         category: quest.category,
         xp: quest.xp,
         priority: quest.priority || 'medium',
@@ -88,13 +94,61 @@ const Index = () => {
     }
   };
 
+  const editQuest = async (questId: string, updates: Partial<Quest>) => {
+    try {
+      const { error } = await supabase.from('quests').update({
+        name: updates.name,
+        description: updates.description,
+        category: updates.category,
+        xp: updates.xp,
+        priority: updates.priority,
+      }).eq('id', questId);
+
+      if (error) throw error;
+      
+      await loadQuests();
+      toast.success('Quest updated!');
+    } catch (error: any) {
+      toast.error('Failed to update quest');
+    }
+  };
+
   const deleteQuest = async (questId: string) => {
     try {
       const { error } = await supabase.from('quests').delete().eq('id', questId);
       if (error) throw error;
       
       await loadQuests();
+      setDeleteConfirmQuest(null);
       toast.success('Quest deleted');
+    } catch (error: any) {
+      toast.error('Failed to delete quest');
+    }
+  };
+
+  const restoreQuest = async (questId: string) => {
+    try {
+      const { error } = await supabase
+        .from('quests')
+        .update({ completed: false, completed_at: null })
+        .eq('id', questId);
+
+      if (error) throw error;
+      
+      await Promise.all([loadQuests(), loadCompletedQuests()]);
+      toast.success('Quest restored!');
+    } catch (error: any) {
+      toast.error('Failed to restore quest');
+    }
+  };
+
+  const permanentDeleteQuest = async (questId: string) => {
+    try {
+      const { error } = await supabase.from('quests').delete().eq('id', questId);
+      if (error) throw error;
+      
+      await loadCompletedQuests();
+      toast.success('Quest permanently deleted');
     } catch (error: any) {
       toast.error('Failed to delete quest');
     }
@@ -151,7 +205,7 @@ const Index = () => {
         level: (player.skills[quest.category] || 0) + 1,
       }, { onConflict: 'user_id,category' });
 
-      await Promise.all([loadPlayerData(), loadQuests()]);
+      await Promise.all([loadPlayerData(), loadQuests(), loadCompletedQuests()]);
       toast.success(`Quest completed! +${quest.xp} XP, +${goldReward} Gold`);
     } catch (error: any) {
       console.error('Error completing quest:', error);
@@ -320,7 +374,7 @@ const Index = () => {
         total_gold_earned: 0,
       }).eq('id', user.id);
 
-      await Promise.all([loadPlayerData(), loadQuests()]);
+      await Promise.all([loadPlayerData(), loadQuests(), loadCompletedQuests()]);
       toast.success('All data has been reset');
     } catch (error: any) {
       toast.error('Failed to reset data');
@@ -401,7 +455,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 mb-8 glass-card p-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-6 mb-8 glass-card p-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -415,6 +469,13 @@ const Index = () => {
             >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Quests</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="archive" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <Archive className="w-4 h-4" />
+              <span className="hidden sm:inline">Archive</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rewards" 
@@ -452,13 +513,25 @@ const Index = () => {
               quests={quests} 
               dailyFocus={dailyFocus}
               onCompleteQuest={completeQuest}
-              onDeleteQuest={deleteQuest}
+              onDeleteQuest={(id) => setDeleteConfirmQuest(id)}
+              onEditQuest={(id) => {
+                const quest = quests.find(q => q.id === id);
+                if (quest) setEditingQuest(quest);
+              }}
               onRushQuest={rushQuest}
               dailyRushUsed={player.dailyRushUsed}
               chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
               selectedQuests={selectedQuests}
               onSelectQuest={handleSelectQuest}
               onBulkComplete={handleBulkComplete}
+            />
+          </TabsContent>
+
+          <TabsContent value="archive">
+            <CompletedQuestsArchive
+              quests={completedQuests}
+              onRestore={restoreQuest}
+              onPermanentDelete={permanentDeleteQuest}
             />
           </TabsContent>
 
@@ -485,6 +558,35 @@ const Index = () => {
             <ImprovedAnalytics player={player} />
           </TabsContent>
         </Tabs>
+
+        {/* Edit Quest Dialog */}
+        {editingQuest && (
+          <EditQuestDialog
+            quest={editingQuest}
+            open={!!editingQuest}
+            onOpenChange={(open) => !open && setEditingQuest(null)}
+            onSave={editQuest}
+            categories={Array.from(new Set(quests.map(q => q.category)))}
+          />
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deleteConfirmQuest} onOpenChange={(open) => !open && setDeleteConfirmQuest(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will delete the quest. You won't be able to undo this action.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => deleteConfirmQuest && deleteQuest(deleteConfirmQuest)}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
