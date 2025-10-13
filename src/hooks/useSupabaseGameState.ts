@@ -82,9 +82,10 @@ export const useSupabaseGameState = (userId: string | undefined) => {
         .select('*')
         .eq('user_id', userId);
 
-      // Transform skills to object
+      // Transform skills to object (deduplicate by taking max level per category)
       const skillsObj = skills?.reduce((acc, skill) => {
-        acc[skill.category] = skill.level;
+        const currentLevel = acc[skill.category] || 0;
+        acc[skill.category] = Math.max(currentLevel, skill.level);
         return acc;
       }, {} as Record<string, number>) || {};
 
@@ -217,6 +218,7 @@ export const useSupabaseGameState = (userId: string | undefined) => {
         .from('quests')
         .select('*')
         .eq('user_id', userId)
+        .eq('completed', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
