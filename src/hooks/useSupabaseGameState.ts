@@ -84,9 +84,12 @@ export const useSupabaseGameState = (userId: string | undefined) => {
         .eq('user_id', userId);
 
       // Transform skills to object (deduplicate by taking max level per category)
+      // Trim category names to prevent duplicates from whitespace
       const skillsObj = skills?.reduce((acc, skill) => {
-        const currentLevel = acc[skill.category] || 0;
-        acc[skill.category] = Math.max(currentLevel, skill.level);
+        const trimmedCategory = skill.category.trim();
+        if (!trimmedCategory) return acc; // Skip empty categories
+        const currentLevel = acc[trimmedCategory] || 0;
+        acc[trimmedCategory] = Math.max(currentLevel, skill.level);
         return acc;
       }, {} as Record<string, number>) || {};
 
