@@ -13,6 +13,8 @@ import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
 import { Settings } from "@/components/quest/Settings";
+import { QuestListSkeleton } from "@/components/quest/QuestListSkeleton";
+import { DashboardSkeleton } from "@/components/quest/DashboardSkeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useSupabaseGameState } from "@/hooks/useSupabaseGameState";
 import { useLocalStorageSync } from "@/hooks/useLocalStorageSync";
@@ -395,7 +397,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen p-2 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-br from-background via-background to-primary/5">
       <KeyboardShortcuts 
         onNewQuest={() => document.getElementById('questName')?.focus()}
         onExportData={() => exportToJSON(player, quests)}
@@ -443,11 +445,11 @@ const Index = () => {
           </div>
           
           <div className="relative">
-            <h1 className="text-5xl md:text-7xl font-bold mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent">
               QuestLog
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground">Gamify your life, one quest at a time ⚔️</p>
+          <p className="text-base sm:text-lg text-muted-foreground">Gamify your life, one quest at a time ⚔️</p>
         </header>
 
         {/* Oracle Message */}
@@ -455,84 +457,96 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-6 mb-8 glass-card p-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-6 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <Home className="w-4 h-4" />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden xs:inline">Home</span>
             </TabsTrigger>
             <TabsTrigger 
               value="quests" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <Target className="w-4 h-4" />
-              <span className="hidden sm:inline">Quests</span>
+              <span className="hidden xs:inline">Quests</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <Archive className="w-4 h-4" />
-              <span className="hidden sm:inline">Archive</span>
+              <span className="hidden xs:inline">Archive</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rewards" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Rewards</span>
+              <span className="hidden xs:inline">Rewards</span>
             </TabsTrigger>
             <TabsTrigger 
               value="progress" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Progress</span>
+              <span className="hidden xs:inline">Progress</span>
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Analytics</span>
+              <span className="hidden xs:inline">Stats</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="home">
-            <div className="space-y-6">
-              <DailyWisdom />
-              <Dashboard player={player} quests={quests} dailyFocus={dailyFocus} />
-            </div>
+            {dataLoading ? (
+              <DashboardSkeleton />
+            ) : (
+              <div className="space-y-6">
+                <DailyWisdom />
+                <Dashboard player={player} quests={quests} dailyFocus={dailyFocus} />
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="quests" className="space-y-6">
             <EnhancedAddQuestForm onAddQuest={addQuest} />
-            <EnhancedQuestList 
-              quests={quests} 
-              dailyFocus={dailyFocus}
-              onCompleteQuest={completeQuest}
-              onDeleteQuest={(id) => setDeleteConfirmQuest(id)}
-              onEditQuest={(id) => {
-                const quest = quests.find(q => q.id === id);
-                if (quest) setEditingQuest(quest);
-              }}
-              onRushQuest={rushQuest}
-              dailyRushUsed={player.dailyRushUsed}
-              chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
-              selectedQuests={selectedQuests}
-              onSelectQuest={handleSelectQuest}
-              onBulkComplete={handleBulkComplete}
-            />
+            {dataLoading ? (
+              <QuestListSkeleton />
+            ) : (
+              <EnhancedQuestList 
+                quests={quests} 
+                dailyFocus={dailyFocus}
+                onCompleteQuest={completeQuest}
+                onDeleteQuest={(id) => setDeleteConfirmQuest(id)}
+                onEditQuest={(id) => {
+                  const quest = quests.find(q => q.id === id);
+                  if (quest) setEditingQuest(quest);
+                }}
+                onRushQuest={rushQuest}
+                dailyRushUsed={player.dailyRushUsed}
+                chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
+                selectedQuests={selectedQuests}
+                onSelectQuest={handleSelectQuest}
+                onBulkComplete={handleBulkComplete}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="archive">
-            <CompletedQuestsArchive
-              quests={completedQuests}
-              onRestore={restoreQuest}
-              onPermanentDelete={permanentDeleteQuest}
-            />
+            {dataLoading ? (
+              <QuestListSkeleton />
+            ) : (
+              <CompletedQuestsArchive
+                quests={completedQuests}
+                onRestore={restoreQuest}
+                onPermanentDelete={permanentDeleteQuest}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="rewards">

@@ -12,7 +12,8 @@ import {
   Search, 
   Filter,
   Trash2,
-  Edit2
+  Edit2,
+  ArrowUpDown
 } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 import { format } from "date-fns";
@@ -47,6 +48,7 @@ export const EnhancedQuestList = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterPriority, setFilterPriority] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("priority");
   const [showFilters, setShowFilters] = useState(false);
 
   // Get unique categories
@@ -62,12 +64,24 @@ export const EnhancedQuestList = ({
     return matchesSearch && matchesCategory && matchesPriority;
   });
 
-  // Sort quests: priority (high first)
+  // Sort quests
   const sortedQuests = [...filteredQuests].sort((a, b) => {
-    const priorityOrder = { high: 3, medium: 2, low: 1 };
-    const aPriority = priorityOrder[a.priority || 'medium'];
-    const bPriority = priorityOrder[b.priority || 'medium'];
-    return bPriority - aPriority;
+    switch (sortBy) {
+      case 'priority': {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        const aPriority = priorityOrder[a.priority || 'medium'];
+        const bPriority = priorityOrder[b.priority || 'medium'];
+        return bPriority - aPriority;
+      }
+      case 'xp':
+        return b.xp - a.xp;
+      case 'date':
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case 'name':
+        return a.name.localeCompare(b.name);
+      default:
+        return 0;
+    }
   });
 
   const getPriorityColor = (priority?: string) => {
@@ -92,11 +106,11 @@ export const EnhancedQuestList = ({
               </span>
             )}
           </h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {selectedQuests.length > 0 && onBulkComplete && (
-              <Button size="sm" onClick={onBulkComplete} variant="outline">
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Complete Selected ({selectedQuests.length})
+              <Button size="sm" onClick={onBulkComplete} variant="outline" className="whitespace-nowrap">
+                <CheckCircle2 className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Complete Selected </span>({selectedQuests.length})
               </Button>
             )}
             <Button
@@ -104,8 +118,8 @@ export const EnhancedQuestList = ({
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
+              <Filter className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Filters</span>
             </Button>
           </div>
         </div>
@@ -121,7 +135,7 @@ export const EnhancedQuestList = ({
           />
         </div>
 
-        {/* Filters */}
+        {/* Filters & Sort */}
         {showFilters && (
           <div className="flex gap-3 flex-wrap p-4 rounded-lg border border-border bg-muted/30">
             <Select value={filterCategory} onValueChange={setFilterCategory}>
@@ -148,16 +162,49 @@ export const EnhancedQuestList = ({
               </SelectContent>
             </Select>
 
-            {(filterCategory !== "all" || filterPriority !== "all") && (
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="priority">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="w-3 h-3" />
+                    Priority
+                  </div>
+                </SelectItem>
+                <SelectItem value="xp">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="w-3 h-3" />
+                    XP Value
+                  </div>
+                </SelectItem>
+                <SelectItem value="date">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="w-3 h-3" />
+                    Date Created
+                  </div>
+                </SelectItem>
+                <SelectItem value="name">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpDown className="w-3 h-3" />
+                    Name (A-Z)
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(filterCategory !== "all" || filterPriority !== "all" || sortBy !== "priority") && (
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => {
                   setFilterCategory("all");
                   setFilterPriority("all");
+                  setSortBy("priority");
                 }}
               >
-                Clear Filters
+                Reset
               </Button>
             )}
           </div>
@@ -197,7 +244,7 @@ export const EnhancedQuestList = ({
                   quest.category === dailyFocus ? 'border-primary/30 glow-primary' : ''
                 }`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                   {onSelectQuest && (
                     <Checkbox
                       checked={selectedQuests.includes(quest.id)}
@@ -206,17 +253,17 @@ export const EnhancedQuestList = ({
                     />
                   )}
                   
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 w-full">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold">{quest.name}</h3>
+                          <h3 className="font-semibold break-words">{quest.name}</h3>
                           {quest.category === dailyFocus && (
-                            <Flame className="w-4 h-4 text-primary" />
+                            <Flame className="w-4 h-4 text-primary flex-shrink-0" />
                           )}
                         </div>
                         {quest.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{quest.description}</p>
+                          <p className="text-sm text-muted-foreground mb-2 break-words">{quest.description}</p>
                         )}
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge variant="outline" className="text-xs">
@@ -238,12 +285,13 @@ export const EnhancedQuestList = ({
                     </div>
                   </div>
 
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto sm:flex-shrink-0">
                     {onEditQuest && (
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => onEditQuest(quest.id)}
+                        className="flex-shrink-0"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -253,7 +301,7 @@ export const EnhancedQuestList = ({
                         size="icon"
                         variant="ghost"
                         onClick={() => onDeleteQuest(quest.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive flex-shrink-0"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -263,17 +311,19 @@ export const EnhancedQuestList = ({
                         size="sm"
                         onClick={() => onRushQuest(quest.id)}
                         variant="outline"
+                        className="flex-shrink-0"
                       >
-                        <Zap className="w-4 h-4 mr-2" />
-                        Rush
+                        <Zap className="w-4 h-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Rush</span>
                       </Button>
                     )}
                     <Button
                       size="sm"
                       onClick={() => onCompleteQuest(quest.id)}
+                      className="flex-1 sm:flex-initial"
                     >
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Complete
+                      <CheckCircle2 className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Complete</span>
                     </Button>
                   </div>
                 </div>
