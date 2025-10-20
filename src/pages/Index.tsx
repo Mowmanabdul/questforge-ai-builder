@@ -6,6 +6,7 @@ import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
 import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
 import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
 import { Dashboard } from "@/components/quest/Dashboard";
+import { AICoachChat } from "@/components/quest/AICoachChat";
 import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
@@ -22,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive } from "lucide-react";
+import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift } from "lucide-react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
@@ -457,7 +458,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-6 mb-8 glass-card p-1 gap-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 sm:grid-cols-7 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
@@ -480,10 +481,17 @@ const Index = () => {
               <span className="hidden xs:inline">Archive</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="rewards" 
+              value="coach" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
               <Sparkles className="w-4 h-4" />
+              <span className="hidden xs:inline">AI Coach</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="rewards" 
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+            >
+              <Gift className="w-4 h-4" />
               <span className="hidden xs:inline">Rewards</span>
             </TabsTrigger>
             <TabsTrigger 
@@ -547,6 +555,10 @@ const Index = () => {
                 onPermanentDelete={permanentDeleteQuest}
               />
             )}
+          </TabsContent>
+
+          <TabsContent value="coach">
+            <AICoachChat player={player} />
           </TabsContent>
 
           <TabsContent value="rewards">

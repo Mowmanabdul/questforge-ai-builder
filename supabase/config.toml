@@ -1,1 +1,7 @@
 project_id = "hmptbfyynqhgvfqzyjaw"
+
+[functions.ai-coach-chat]
+verify_jwt = true
+
+[functions.generate-weekly-insights]
+verify_jwt = true
