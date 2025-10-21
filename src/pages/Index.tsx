@@ -38,6 +38,8 @@ const Index = () => {
   const [dailyFocus, setDailyFocus] = useState<string>("");
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [deleteConfirmQuest, setDeleteConfirmQuest] = useState<string | null>(null);
+  const [aiCoachQuestContext, setAiCoachQuestContext] = useState<Quest | undefined>();
+  const [activeTab, setActiveTab] = useState<string>("home");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -221,6 +223,28 @@ const Index = () => {
       await completeQuest(id);
     }
     setSelectedQuests([]);
+  };
+
+  const handleAskAICoach = (quest: Quest) => {
+    setAiCoachQuestContext(quest);
+    setActiveTab('coach');
+  };
+
+  const handleClearAIContext = () => {
+    setAiCoachQuestContext(undefined);
+  };
+
+  const handleEditQuest = (questId: string) => {
+    const quest = quests.find(q => q.id === questId);
+    if (quest) setEditingQuest(quest);
+  };
+
+  const handleDeleteQuest = (questId: string) => {
+    setDeleteConfirmQuest(questId);
+  };
+
+  const handleRushQuest = async (questId: string) => {
+    await rushQuest(questId);
   };
 
   const rushQuest = async (questId: string) => {
@@ -457,7 +481,7 @@ const Index = () => {
         {oracleMessage && <OracleMessage message={oracleMessage} />}
 
         {/* Navigation Tabs */}
-        <Tabs defaultValue="home" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 sm:grid-cols-7 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
@@ -530,12 +554,10 @@ const Index = () => {
                 quests={quests} 
                 dailyFocus={dailyFocus}
                 onCompleteQuest={completeQuest}
-                onDeleteQuest={(id) => setDeleteConfirmQuest(id)}
-                onEditQuest={(id) => {
-                  const quest = quests.find(q => q.id === id);
-                  if (quest) setEditingQuest(quest);
-                }}
-                onRushQuest={rushQuest}
+                onDeleteQuest={handleDeleteQuest}
+                onEditQuest={handleEditQuest}
+                onAskAICoach={handleAskAICoach}
+                onRushQuest={handleRushQuest}
                 dailyRushUsed={player.dailyRushUsed}
                 chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
                 selectedQuests={selectedQuests}
@@ -558,7 +580,13 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="coach">
-            <AICoachChat player={player} />
+            <AICoachChat 
+              player={player} 
+              activeQuests={quests}
+              questContext={aiCoachQuestContext}
+              onAddQuest={addQuest}
+              onClearContext={handleClearAIContext}
+            />
           </TabsContent>
 
           <TabsContent value="rewards">

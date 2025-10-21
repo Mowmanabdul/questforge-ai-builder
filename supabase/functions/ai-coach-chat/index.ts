@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, playerContext } = await req.json();
+    const { messages, playerContext, requestType, questContext, activeQuests } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
@@ -24,16 +24,47 @@ serve(async (req) => {
       );
     }
 
-    // Build system prompt with player context
-    const systemPrompt = `You are an experienced productivity coach and motivational mentor in a gamified quest system. 
+    // Build system prompt based on request type
+    let systemPrompt = `You are an experienced productivity coach and motivational mentor in a gamified quest system. 
 
 Player Context:
 - Level ${playerContext.level} (${playerContext.xp} XP)
 - ${playerContext.gold} gold coins
 - ${playerContext.streak} day streak
-- Completed ${playerContext.completedQuests} quests total
+- Completed ${playerContext.completedQuests} quests total`;
 
-Your role:
+    if (requestType === 'suggest') {
+      systemPrompt += `\n\nActive Quests:\n${activeQuests?.map((q: any) => `- ${q.name} (${q.category}, ${q.priority} priority, ${q.xp} XP)`).join('\n') || 'None'}
+
+Your task: Analyze the player's profile and active quests to suggest 3-5 NEW actionable quests they should add. Consider:
+- Balance across categories
+- Appropriate difficulty for their level
+- Gaps in their current quests
+- Building on their momentum (${playerContext.streak} day streak!)
+
+Be specific and practical with quest suggestions.`;
+    } else if (requestType === 'review') {
+      systemPrompt += `\n\nActive Quests:\n${activeQuests?.map((q: any) => `- ${q.name} (${q.category}, ${q.priority} priority, ${q.xp} XP)`).join('\n') || 'None'}
+
+Your task: Review their active quests and provide prioritization advice. Consider:
+- Which quests align with maintaining their ${playerContext.streak} day streak
+- Which high-priority items need immediate attention
+- Suggest a good order to tackle them today
+- Identify if any quests might be overwhelming and need breaking down
+
+Give clear, actionable prioritization guidance.`;
+    } else if (questContext) {
+      systemPrompt += `\n\nSpecific Quest Context:\n- Name: ${questContext.name}\n- Category: ${questContext.category}\n- Priority: ${questContext.priority}\n- XP Value: ${questContext.xp}${questContext.description ? `\n- Description: ${questContext.description}` : ''}
+
+Your task: Provide personalized coaching specifically for THIS quest. Offer:
+- Strategies to complete it effectively
+- Tips for staying motivated
+- Ways to break it down if needed
+- How it fits into their overall progress
+
+Focus your entire response on helping them succeed with this specific quest.`;
+    } else {
+      systemPrompt += `\n\nYour role:
 - Provide personalized motivation and productivity advice
 - Help break down overwhelming tasks into manageable quests
 - Celebrate wins and encourage during setbacks
@@ -43,8 +74,56 @@ Your role:
 - Focus on sustainable progress over perfection
 
 Remember: Every hero's journey has ups and downs. Your job is to be their trusted guide.`;
+    }
 
-    console.log('Calling AI coach with context:', playerContext);
+    console.log('Calling AI coach with context:', { playerContext, requestType });
+
+    const requestBody: any = {
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ],
+      temperature: 0.8,
+      max_tokens: 500,
+      stream: true,
+    };
+
+    // Add tool calling for quest suggestions
+    if (requestType === 'suggest') {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "suggest_quests",
+            description: "Return 3-5 actionable quest suggestions based on player analysis.",
+            parameters: {
+              type: "object",
+              properties: {
+                suggestions: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string", description: "Quest name" },
+                      category: { type: "string", description: "Quest category" },
+                      priority: { type: "string", enum: ["low", "medium", "high"], description: "Quest priority" },
+                      xp: { type: "number", description: "XP reward (10-100)" },
+                      description: { type: "string", description: "Brief quest description" }
+                    },
+                    required: ["name", "category", "priority", "xp"],
+                    additionalProperties: false
+                  }
+                }
+              },
+              required: ["suggestions"],
+              additionalProperties: false
+            }
+          }
+        }
+      ];
+      requestBody.tool_choice = { type: "function", function: { name: "suggest_quests" } };
+    }
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -52,16 +131,7 @@ Remember: Every hero's journey has ups and downs. Your job is to be their truste
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ],
-        temperature: 0.8,
-        max_tokens: 500,
-        stream: true,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!aiResponse.ok) {

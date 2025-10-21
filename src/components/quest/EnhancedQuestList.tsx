@@ -13,7 +13,8 @@ import {
   Filter,
   Trash2,
   Edit2,
-  ArrowUpDown
+  ArrowUpDown,
+  MessageCircle
 } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 import { format } from "date-fns";
@@ -25,6 +26,7 @@ interface EnhancedQuestListProps {
   onRushQuest?: (questId: string) => void;
   onDeleteQuest?: (questId: string) => void;
   onEditQuest?: (questId: string) => void;
+  onAskAICoach?: (quest: Quest) => void;
   dailyRushUsed?: boolean;
   chronoLevel?: number;
   selectedQuests?: string[];
@@ -39,6 +41,7 @@ export const EnhancedQuestList = ({
   onRushQuest,
   onDeleteQuest,
   onEditQuest,
+  onAskAICoach,
   dailyRushUsed = false,
   chronoLevel = 0,
   selectedQuests = [],
@@ -286,6 +289,17 @@ export const EnhancedQuestList = ({
                   </div>
 
                   <div className="flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto sm:flex-shrink-0">
+                    {onAskAICoach && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => onAskAICoach(quest)}
+                        className="flex-shrink-0"
+                        title="Ask AI Coach"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </Button>
+                    )}
                     {onEditQuest && (
                       <Button
                         size="icon"
