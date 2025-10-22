@@ -8,6 +8,7 @@ import { Send, Sparkles, Loader2, Lightbulb, ListChecks, Plus } from "lucide-rea
 import { Player, Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -297,7 +298,13 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                         : 'bg-muted'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    {msg.role === 'user' ? (
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    ) : (
+                      <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {msg.questSuggestions && msg.questSuggestions.length > 0 && (
