@@ -14,6 +14,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   questSuggestions?: QuestSuggestion[];
+  subtaskSuggestions?: SubtaskSuggestion[];
 }
 
 interface QuestSuggestion {
@@ -24,15 +25,20 @@ interface QuestSuggestion {
   description?: string;
 }
 
+interface SubtaskSuggestion {
+  name: string;
+}
+
 interface AICoachChatProps {
   player: Player;
   activeQuests: Quest[];
   questContext?: Quest;
   onAddQuest?: (quest: Omit<Quest, 'id' | 'completed' | 'completedAt' | 'createdAt'>) => void;
   onClearContext?: () => void;
+  onUpdateQuest?: (questId: string, updates: Partial<Quest>) => void;
 }
 
-export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, onClearContext }: AICoachChatProps) => {
+export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, onClearContext, onUpdateQuest }: AICoachChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +59,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
     }
   }, [messages]);
 
-  const streamChat = async (userMessage: string, requestType?: string) => {
+  const streamChat = async (userMessage: string, requestType?: string, breakdownQuest?: Quest) => {
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
@@ -98,6 +104,24 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
           xp: questContext.xp,
           description: questContext.description
         };
+      } else if (requestType === 'breakdown' && breakdownQuest) {
+        requestBody.requestType = 'breakdown';
+        requestBody.breakdownQuest = {
+          name: breakdownQuest.name,
+          category: breakdownQuest.category,
+          priority: breakdownQuest.priority,
+          xp: breakdownQuest.xp,
+          description: breakdownQuest.description
+        };
+      } else if (requestType === 'smart_reminder') {
+        requestBody.requestType = 'smart_reminder';
+        requestBody.activeQuests = activeQuests.map(q => ({
+          name: q.name,
+          category: q.category,
+          priority: q.priority,
+          xp: q.xp,
+          dueDate: q.dueDate
+        }));
       }
 
       const response = await fetch(CHAT_URL, {
@@ -151,7 +175,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
               setMessages([...newMessages, { role: 'assistant', content: assistantMessage }]);
             }
             
-            // Handle tool calls for quest suggestions
+            // Handle tool calls for quest suggestions and subtask breakdown
             if (toolCalls && toolCalls[0]?.function?.arguments) {
               try {
                 const args = JSON.parse(toolCalls[0].function.arguments);
@@ -161,6 +185,13 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     role: 'assistant', 
                     content: "Here are my quest suggestions for you:", 
                     questSuggestions 
+                  }]);
+                } else if (args.subtasks) {
+                  const subtaskSuggestions = args.subtasks;
+                  setMessages([...newMessages, { 
+                    role: 'assistant', 
+                    content: "Here's how I'd break down this quest:", 
+                    subtaskSuggestions 
                   }]);
                 }
               } catch (e) {
@@ -187,7 +218,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
     }
   };
 
-  const handleSpecialRequest = async (type: 'suggest' | 'review' | 'quest-specific', customMessage?: string) => {
+  const handleSpecialRequest = async (type: 'suggest' | 'review' | 'quest-specific' | 'breakdown' | 'smart_reminder', customMessage?: string, quest?: Quest) => {
     if (isLoading) return;
     
     let userMessage = '';
@@ -195,11 +226,15 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
       userMessage = 'Can you suggest some new quests for me based on my current progress?';
     } else if (type === 'review') {
       userMessage = 'Can you review my active quests and help me prioritize them?';
+    } else if (type === 'breakdown' && quest) {
+      userMessage = `Can you break down this quest into smaller subtasks: "${quest.name}"?`;
+    } else if (type === 'smart_reminder') {
+      userMessage = 'What quests should I focus on right now?';
     } else if (customMessage) {
       userMessage = customMessage;
     }
     
-    await streamChat(userMessage, type);
+    await streamChat(userMessage, type, quest);
   };
 
   const handleSend = async () => {
@@ -283,6 +318,15 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     <ListChecks className="w-4 h-4 mr-2" />
                     Review & Prioritize My Quests
                   </Button>
+                  <Button
+                    onClick={() => handleSpecialRequest('smart_reminder')}
+                    variant="outline"
+                    className="w-full"
+                    disabled={isLoading || activeQuests.length === 0}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    What Should I Work On Now?
+                  </Button>
                 </div>
               </div>
             )}
@@ -307,6 +351,40 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     )}
                   </div>
                 </div>
+                {msg.subtaskSuggestions && msg.subtaskSuggestions.length > 0 && questContext && onUpdateQuest && (
+                  <div className="mt-3">
+                    <Card className="p-3 bg-muted/50">
+                      <h4 className="font-semibold text-sm mb-2">Suggested Subtasks:</h4>
+                      <ul className="space-y-1 mb-3">
+                        {msg.subtaskSuggestions.map((subtask, sIdx) => (
+                          <li key={sIdx} className="text-sm flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            {subtask.name}
+                          </li>
+                        ))}
+                      </ul>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const subtasks = msg.subtaskSuggestions!.map((s, idx) => ({
+                            id: `subtask-${Date.now()}-${idx}`,
+                            name: s.name,
+                            completed: false
+                          }));
+                          onUpdateQuest(questContext.id, { subtasks });
+                          toast({
+                            title: "Subtasks Added!",
+                            description: `Added ${subtasks.length} subtasks to "${questContext.name}".`,
+                          });
+                        }}
+                        className="w-full"
+                      >
+                        <Plus className="w-3 h-3 mr-1" />
+                        Add All Subtasks
+                      </Button>
+                    </Card>
+                  </div>
+                )}
                 {msg.questSuggestions && msg.questSuggestions.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {msg.questSuggestions.map((suggestion, sIdx) => (

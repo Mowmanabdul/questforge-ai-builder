@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
+export interface Subtask {
+  id: string;
+  name: string;
+  completed: boolean;
+}
+
 export interface Quest {
   id: string;
   name: string;
@@ -12,6 +18,7 @@ export interface Quest {
   description?: string;
   dueDate?: Date;
   priority?: 'low' | 'medium' | 'high';
+  subtasks?: Subtask[];
   recurring?: {
     frequency: 'daily' | 'weekly' | 'monthly';
     lastCompleted?: Date;

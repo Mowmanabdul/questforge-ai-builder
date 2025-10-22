@@ -5,7 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
+import { QuestBreakdown } from "./QuestBreakdown";
+import { format } from "date-fns";
 
 interface EditQuestDialogProps {
   quest: Quest;
@@ -13,14 +18,17 @@ interface EditQuestDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (questId: string, updates: Partial<Quest>) => void;
   categories: string[];
+  onRequestAIBreakdown?: (quest: Quest) => void;
 }
 
-export const EditQuestDialog = ({ quest, open, onOpenChange, onSave, categories }: EditQuestDialogProps) => {
+export const EditQuestDialog = ({ quest, open, onOpenChange, onSave, categories, onRequestAIBreakdown }: EditQuestDialogProps) => {
   const [name, setName] = useState(quest.name);
   const [description, setDescription] = useState(quest.description || "");
   const [category, setCategory] = useState(quest.category);
   const [xp, setXp] = useState(quest.xp.toString());
   const [priority, setPriority] = useState(quest.priority || "medium");
+  const [dueDate, setDueDate] = useState<Date | undefined>(quest.dueDate);
+  const [currentQuest, setCurrentQuest] = useState(quest);
 
   const handleSave = () => {
     onSave(quest.id, {
@@ -29,13 +37,19 @@ export const EditQuestDialog = ({ quest, open, onOpenChange, onSave, categories 
       category,
       xp: parseInt(xp),
       priority: priority as any,
+      dueDate,
     });
     onOpenChange(false);
   };
 
+  const handleUpdateSubtasks = (questId: string, updates: Partial<Quest>) => {
+    setCurrentQuest({ ...currentQuest, ...updates });
+    onSave(questId, updates);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Quest</DialogTitle>
         </DialogHeader>
@@ -102,6 +116,35 @@ export const EditQuestDialog = ({ quest, open, onOpenChange, onSave, categories 
               </SelectContent>
             </Select>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dueDate">Due Date (Optional)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <QuestBreakdown
+            quest={currentQuest}
+            onUpdateQuest={handleUpdateSubtasks}
+            onRequestAIBreakdown={onRequestAIBreakdown}
+          />
         </div>
 
         <div className="flex justify-end gap-3">

@@ -23,7 +23,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift } from "lucide-react";
+import { CalendarView } from "@/components/quest/CalendarView";
+import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift, Calendar as CalendarIcon } from "lucide-react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,13 +102,25 @@ const Index = () => {
 
   const editQuest = async (questId: string, updates: Partial<Quest>) => {
     try {
-      const { error } = await supabase.from('quests').update({
+      const updateData: any = {
         name: updates.name,
         description: updates.description,
         category: updates.category,
         xp: updates.xp,
         priority: updates.priority,
-      }).eq('id', questId);
+      };
+
+      // Handle due date
+      if (updates.dueDate !== undefined) {
+        updateData.due_date = updates.dueDate;
+      }
+
+      // Handle subtasks (store as JSON)
+      if (updates.subtasks !== undefined) {
+        updateData.subtasks = updates.subtasks;
+      }
+
+      const { error } = await supabase.from('quests').update(updateData).eq('id', questId);
 
       if (error) throw error;
       
@@ -226,6 +239,11 @@ const Index = () => {
   };
 
   const handleAskAICoach = (quest: Quest) => {
+    setAiCoachQuestContext(quest);
+    setActiveTab('coach');
+  };
+
+  const handleRequestAIBreakdown = (quest: Quest) => {
     setAiCoachQuestContext(quest);
     setActiveTab('coach');
   };
@@ -482,7 +500,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 sm:grid-cols-7 mb-8 glass-card p-1 gap-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 sm:grid-cols-8 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
@@ -496,6 +514,13 @@ const Index = () => {
             >
               <Target className="w-4 h-4" />
               <span className="hidden xs:inline">Quests</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="calendar" 
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+            >
+              <CalendarIcon className="w-4 h-4" />
+              <span className="hidden xs:inline">Calendar</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
@@ -567,6 +592,13 @@ const Index = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="calendar">
+            <CalendarView 
+              quests={quests}
+              onQuestClick={(quest) => handleEditQuest(quest.id)}
+            />
+          </TabsContent>
+
           <TabsContent value="archive">
             {dataLoading ? (
               <QuestListSkeleton />
@@ -586,6 +618,7 @@ const Index = () => {
               questContext={aiCoachQuestContext}
               onAddQuest={addQuest}
               onClearContext={handleClearAIContext}
+              onUpdateQuest={editQuest}
             />
           </TabsContent>
 
@@ -621,6 +654,7 @@ const Index = () => {
             onOpenChange={(open) => !open && setEditingQuest(null)}
             onSave={editQuest}
             categories={Array.from(new Set(quests.map(q => q.category)))}
+            onRequestAIBreakdown={handleRequestAIBreakdown}
           />
         )}
 

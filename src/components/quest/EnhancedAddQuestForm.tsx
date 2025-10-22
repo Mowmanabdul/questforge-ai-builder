@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { PlusCircle, CalendarIcon } from "lucide-react";
 import { Quest } from "@/hooks/useGameState";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface EnhancedAddQuestFormProps {
   onAddQuest: (quest: Omit<Quest, 'id' | 'completed' | 'createdAt'>) => void;
@@ -18,6 +21,7 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Work");
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [dueDate, setDueDate] = useState<Date>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,12 +39,14 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
       category,
       xp: xpByPriority[priority],
       priority,
+      dueDate: dueDate,
     });
 
     // Reset form
     setQuestName("");
     setDescription("");
     setPriority('medium');
+    setDueDate(undefined);
   };
 
   return (
@@ -106,6 +112,29 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dueDate">Due Date (Optional)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal bg-background/50"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <Button type="submit" className="w-full">

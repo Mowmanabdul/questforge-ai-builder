@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, playerContext, requestType, questContext, activeQuests } = await req.json();
+    const { messages, playerContext, requestType, questContext, activeQuests, breakdownQuest } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {
@@ -33,7 +33,21 @@ Player Context:
 - ${playerContext.streak} day streak
 - Completed ${playerContext.completedQuests} quests total`;
 
-    if (requestType === 'suggest') {
+    if (requestType === 'breakdown') {
+      systemPrompt += `\n\nQuest to Break Down:\n- Name: ${breakdownQuest.name}\n- Category: ${breakdownQuest.category}\n- Priority: ${breakdownQuest.priority}${breakdownQuest.description ? `\n- Description: ${breakdownQuest.description}` : ''}
+
+Your task: Break this quest down into 3-5 clear, actionable subtasks. Each subtask should be specific and achievable.`;
+    } else if (requestType === 'smart_reminder') {
+      systemPrompt += `\n\nActive Quests:\n${activeQuests?.map((q: any) => `- ${q.name} (${q.category}, ${q.priority} priority${q.dueDate ? `, due ${new Date(q.dueDate).toLocaleDateString()}` : ''})`).join('\n') || 'None'}
+
+Your task: Based on current priorities, urgency, and due dates, suggest 2-3 quests the player should focus on RIGHT NOW. Explain why each is a good choice for this moment. Consider:
+- Approaching due dates (urgency)
+- High priority items
+- Quick wins vs longer tasks
+- Variety in task types
+
+Give clear, actionable recommendations for what to work on now.`;
+    } else if (requestType === 'suggest') {
       systemPrompt += `\n\nActive Quests:\n${activeQuests?.map((q: any) => `- ${q.name} (${q.category}, ${q.priority} priority, ${q.xp} XP)`).join('\n') || 'None'}
 
 Your task: Analyze the player's profile and active quests to suggest 3-5 NEW actionable quests they should add. Consider:
@@ -76,7 +90,7 @@ Focus your entire response on helping them succeed with this specific quest.`;
 Remember: Every hero's journey has ups and downs. Your job is to be their trusted guide.`;
     }
 
-    console.log('Calling AI coach with context:', { playerContext, requestType });
+    console.log('Calling AI coach with context:', { playerContext, requestType, breakdownQuest: !!breakdownQuest });
 
     const requestBody: any = {
       model: 'google/gemini-2.5-flash',
@@ -89,8 +103,37 @@ Remember: Every hero's journey has ups and downs. Your job is to be their truste
       stream: true,
     };
 
-    // Add tool calling for quest suggestions
-    if (requestType === 'suggest') {
+    // Add tool calling for quest suggestions and breakdowns
+    if (requestType === 'breakdown') {
+      requestBody.tools = [
+        {
+          type: "function",
+          function: {
+            name: "breakdown_quest",
+            description: "Return 3-5 subtasks for breaking down a quest",
+            parameters: {
+              type: "object",
+              properties: {
+                subtasks: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string", description: "Clear, actionable subtask description" }
+                    },
+                    required: ["name"],
+                    additionalProperties: false
+                  }
+                }
+              },
+              required: ["subtasks"],
+              additionalProperties: false
+            }
+          }
+        }
+      ];
+      requestBody.tool_choice = { type: "function", function: { name: "breakdown_quest" } };
+    } else if (requestType === 'suggest') {
       requestBody.tools = [
         {
           type: "function",
