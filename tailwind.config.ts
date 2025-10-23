@@ -116,6 +116,49 @@ export default {
             opacity: "1",
           },
         },
+        questComplete: {
+          "0%": {
+            transform: "scale(1) rotate(0deg)",
+            opacity: "1",
+          },
+          "20%": {
+            transform: "scale(1.15) rotate(5deg)",
+          },
+          "40%": {
+            transform: "scale(1.1) rotate(-5deg)",
+          },
+          "60%": {
+            transform: "scale(1.15) rotate(3deg)",
+          },
+          "80%": {
+            transform: "scale(1.05) rotate(-2deg)",
+            opacity: "0.8",
+          },
+          "100%": {
+            transform: "scale(0) rotate(0deg)",
+            opacity: "0",
+          },
+        },
+        slideInRight: {
+          from: {
+            transform: "translateX(100%)",
+            opacity: "0",
+          },
+          to: {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+        },
+        slideInUp: {
+          from: {
+            transform: "translateY(20px)",
+            opacity: "0",
+          },
+          to: {
+            transform: "translateY(0)",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -123,6 +166,9 @@ export default {
         "fade-in": "fadeIn 0.5s ease-out",
         "float": "float 3s ease-in-out infinite",
         "level-up": "levelUp 0.6s ease-in-out",
+        "quest-complete": "questComplete 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "slide-in-right": "slideInRight 0.4s ease-out",
+        "slide-in-up": "slideInUp 0.4s ease-out",
       },
     },
   },

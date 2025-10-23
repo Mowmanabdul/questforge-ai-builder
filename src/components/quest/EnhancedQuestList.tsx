@@ -243,8 +243,8 @@ export const EnhancedQuestList = ({
           sortedQuests.map((quest) => (
               <div
                 key={quest.id}
-                className={`glass-card p-4 rounded-lg transition-all hover:border-primary/50 ${
-                  quest.category === dailyFocus ? 'border-primary/30 glow-primary' : ''
+                className={`glass-card p-3 sm:p-4 rounded-lg card-hover ${
+                  quest.category === dailyFocus ? 'border-primary/40 glow-primary' : ''
                 }`}
               >
                 <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
@@ -260,27 +260,32 @@ export const EnhancedQuestList = ({
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold break-words">{quest.name}</h3>
+                          <h3 className="font-semibold text-base sm:text-lg break-words">{quest.name}</h3>
                           {quest.category === dailyFocus && (
-                            <Flame className="w-4 h-4 text-primary flex-shrink-0" />
+                            <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 animate-icon-pulse" />
                           )}
                         </div>
                         {quest.description && (
-                          <p className="text-sm text-muted-foreground mb-2 break-words">{quest.description}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground mb-2 break-words line-clamp-2">{quest.description}</p>
                         )}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge variant="outline" className="text-xs">
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs hover-scale-smooth">
                             {quest.category}
                           </Badge>
                           {quest.priority && (
-                            <Badge variant="outline" className={`text-xs ${getPriorityColor(quest.priority)}`}>
+                            <Badge variant="outline" className={`text-xs hover-scale-smooth ${getPriorityColor(quest.priority)}`}>
                               {quest.priority}
                             </Badge>
                           )}
-                          <span className="text-xs text-secondary font-semibold">
-                            {quest.xp} XP
+                          {quest.dueDate && (
+                            <Badge variant="outline" className="text-xs">
+                              📅 {format(new Date(quest.dueDate), 'MMM d')}
+                            </Badge>
+                          )}
+                          <span className="text-xs sm:text-sm text-secondary font-semibold flex items-center gap-1">
+                            ⭐ {quest.xp} XP
                             {quest.category === dailyFocus && (
-                              <span className="text-primary ml-1">(+25%)</span>
+                              <span className="text-primary font-bold">(+25%)</span>
                             )}
                           </span>
                         </div>
@@ -288,13 +293,13 @@ export const EnhancedQuestList = ({
                     </div>
                   </div>
 
-                  <div className="flex gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto sm:flex-shrink-0">
+                  <div className="flex gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto sm:flex-shrink-0">
                     {onAskAICoach && (
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => onAskAICoach(quest)}
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 hover-scale-smooth h-9 w-9 sm:h-10 sm:w-10"
                         title="Ask AI Coach"
                       >
                         <MessageCircle className="w-4 h-4" />
@@ -305,7 +310,7 @@ export const EnhancedQuestList = ({
                         size="icon"
                         variant="ghost"
                         onClick={() => onEditQuest(quest.id)}
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 hover-scale-smooth h-9 w-9 sm:h-10 sm:w-10"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -315,7 +320,7 @@ export const EnhancedQuestList = ({
                         size="icon"
                         variant="ghost"
                         onClick={() => onDeleteQuest(quest.id)}
-                        className="text-destructive hover:text-destructive flex-shrink-0"
+                        className="text-destructive hover:text-destructive flex-shrink-0 hover-scale-smooth h-9 w-9 sm:h-10 sm:w-10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -325,19 +330,19 @@ export const EnhancedQuestList = ({
                         size="sm"
                         onClick={() => onRushQuest(quest.id)}
                         variant="outline"
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 hover-scale-smooth min-h-9 sm:min-h-10"
                       >
-                        <Zap className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Rush</span>
+                        <Zap className="w-4 h-4 sm:mr-1.5" />
+                        <span className="hidden sm:inline text-xs sm:text-sm">Rush</span>
                       </Button>
                     )}
                     <Button
                       size="sm"
                       onClick={() => onCompleteQuest(quest.id)}
-                      className="flex-1 sm:flex-initial"
+                      className="flex-1 sm:flex-initial hover-scale-smooth min-h-9 sm:min-h-10"
                     >
-                      <CheckCircle2 className="w-4 h-4 sm:mr-2" />
-                      <span className="hidden sm:inline">Complete</span>
+                      <CheckCircle2 className="w-4 h-4 sm:mr-1.5" />
+                      <span className="hidden sm:inline text-xs sm:text-sm">Complete</span>
                     </Button>
                   </div>
                 </div>
