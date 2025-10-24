@@ -45,11 +45,40 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Auto-populate message when quest context is provided
+  // Load conversation history from localStorage
   useEffect(() => {
-    if (questContext && messages.length === 0) {
-      handleSpecialRequest('quest-specific', 
-        `Help me with this quest: "${questContext.name}" (${questContext.category}, ${questContext.priority} priority)`);
+    const savedMessages = localStorage.getItem('ai_coach_history');
+    if (savedMessages) {
+      try {
+        const parsed = JSON.parse(savedMessages);
+        setMessages(parsed.slice(-20)); // Keep last 20 messages for context
+      } catch (e) {
+        console.error('Failed to load conversation history:', e);
+      }
+    }
+  }, []);
+
+  // Save conversation history to localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('ai_coach_history', JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Populate initial context if questContext is provided
+  useEffect(() => {
+    if (questContext) {
+      const contextMessage = {
+        role: 'assistant' as const,
+        content: `⚔️ Greetings, Champion! I see you've selected the quest: **"${questContext.name}"**\n\n` +
+                 `Category: ${questContext.category} | Priority: ${questContext.priority} | XP: ${questContext.xp}\n\n` +
+                 `How shall we conquer this quest? I can:\n` +
+                 `• Break it into strategic subtasks\n` +
+                 `• Suggest approaches based on your current level (${player.level})\n` +
+                 `• Provide tactical advice for maximum efficiency\n\n` +
+                 `What's your move, Adventurer?`
+      };
+      setMessages(prev => [...prev.slice(-19), contextMessage]); // Keep history but add context
     }
   }, [questContext]);
 
@@ -65,12 +94,20 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
     setIsLoading(true);
 
     try {
+      // Enhanced player context with history awareness
+      const recentCompletedCount = player.stats.questsCompleted || 0;
+      const topCategories = Object.entries(player.skills)
+        .sort((a, b) => (b[1] as number) - (a[1] as number))
+        .slice(0, 3)
+        .map(([cat, level]) => `${cat} (Level ${level})`);
+
       const playerContext = {
         level: player.level,
         xp: player.xp,
         gold: player.gold,
         streak: player.streak,
-        completedQuests: player.stats.questsCompleted,
+        completedQuests: recentCompletedCount,
+        topSkills: topCategories.join(', '),
       };
 
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-coach-chat`;
@@ -294,9 +331,9 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
             {messages.length === 0 && !questContext && (
               <div className="text-center py-8 text-muted-foreground space-y-4">
                 <div>
-                  <p className="mb-2">👋 Hello, Hero!</p>
+                  <p className="mb-2 text-lg">⚔️ Greetings, Hero!</p>
                   <p className="text-sm">
-                    I'm your AI productivity coach. Try these quick actions:
+                    I'm Sage, your AI productivity coach. Ready to level up your quest game?
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -307,7 +344,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading}
                   >
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    Suggest New Quests
+                    ✨ Suggest New Quests
                   </Button>
                   <Button
                     onClick={() => handleSpecialRequest('review')}
@@ -316,7 +353,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading || activeQuests.length === 0}
                   >
                     <ListChecks className="w-4 h-4 mr-2" />
-                    Review & Prioritize My Quests
+                    📋 Review My Quest Log
                   </Button>
                   <Button
                     onClick={() => handleSpecialRequest('smart_reminder')}
@@ -325,7 +362,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading || activeQuests.length === 0}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    What Should I Work On Now?
+                    🎯 What Should I Tackle Next?
                   </Button>
                 </div>
               </div>

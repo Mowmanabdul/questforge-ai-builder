@@ -11,6 +11,7 @@ import { PlayerProgress } from "@/components/quest/PlayerProgress";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
+import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
 import { Settings } from "@/components/quest/Settings";
@@ -497,6 +498,13 @@ const Index = () => {
 
         {/* Oracle Message */}
         {oracleMessage && <OracleMessage message={oracleMessage} />}
+        
+        {/* Proactive AI Coach */}
+        <ProactiveCoach 
+          player={player} 
+          activeQuests={quests}
+          onNavigateToCoach={() => setActiveTab('coach')}
+        />
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
