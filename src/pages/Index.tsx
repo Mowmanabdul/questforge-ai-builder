@@ -7,7 +7,8 @@ import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
 import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
 import { Dashboard } from "@/components/quest/Dashboard";
 import { AICoachChat } from "@/components/quest/AICoachChat";
-import { PlayerProgress } from "@/components/quest/PlayerProgress";
+import { DashboardStats } from "@/components/quest/DashboardStats";
+import { Armory } from "@/components/quest/Armory";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
@@ -644,7 +645,12 @@ const Index = () => {
 
           <TabsContent value="progress">
             <div className="space-y-6">
-              <PlayerProgress player={player} onEquip={equipItem} onUnequip={unequipItem} />
+              <DashboardStats player={player} />
+              <Armory 
+                inventory={player.inventory}
+                onEquip={equipItem}
+                onUnequip={unequipItem}
+              />
               <AchievementsGallery achievements={player.achievements} />
             </div>
           </TabsContent>

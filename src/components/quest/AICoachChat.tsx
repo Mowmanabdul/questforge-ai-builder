@@ -382,8 +382,28 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     {msg.role === 'user' ? (
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     ) : (
-                      <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      <div className="text-sm prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-ul:space-y-2 prose-p:leading-relaxed prose-headings:mb-2 prose-headings:mt-4 first:prose-headings:mt-0">
+                        <ReactMarkdown
+                          components={{
+                            h1: ({node, ...props}) => <h1 className="text-lg font-bold mb-3 text-primary" {...props} />,
+                            h2: ({node, ...props}) => <h2 className="text-base font-bold mb-2 text-primary" {...props} />,
+                            h3: ({node, ...props}) => <h3 className="text-sm font-semibold mb-2" {...props} />,
+                            p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
+                            ul: ({node, ...props}) => <ul className="space-y-2 mb-3 ml-4" {...props} />,
+                            ol: ({node, ...props}) => <ol className="space-y-2 mb-3 ml-4" {...props} />,
+                            li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                            strong: ({node, ...props}) => <strong className="font-bold text-primary" {...props} />,
+                            em: ({node, ...props}) => <em className="italic" {...props} />,
+                            code: ({node, inline, ...props}: any) => 
+                              inline ? (
+                                <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props} />
+                              ) : (
+                                <code className="block bg-muted p-3 rounded text-sm my-2" {...props} />
+                              ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
                       </div>
                     )}
                   </div>

@@ -14,7 +14,9 @@ interface CalendarViewProps {
 export const CalendarView = ({ quests, onQuestClick }: CalendarViewProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
+  // Show all quests, including those without due dates
   const questsWithDates = quests.filter(q => !q.completed && q.dueDate);
+  const questsWithoutDates = quests.filter(q => !q.completed && !q.dueDate);
   
   const questsForSelectedDate = selectedDate
     ? questsWithDates.filter(q => q.dueDate && isSameDay(new Date(q.dueDate), selectedDate))
@@ -65,13 +67,11 @@ export const CalendarView = ({ quests, onQuestClick }: CalendarViewProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {questsForSelectedDate.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No quests scheduled for this day
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {questsForSelectedDate.map(quest => (
+          <div className="space-y-4">
+            {questsForSelectedDate.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-muted-foreground">Scheduled for this day</h3>
+                {questsForSelectedDate.map(quest => (
                 <div
                   key={quest.id}
                   className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
@@ -99,8 +99,49 @@ export const CalendarView = ({ quests, onQuestClick }: CalendarViewProps) => {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
+              </div>
+            )}
+            
+            {questsWithoutDates.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-muted-foreground">Unscheduled Quests</h3>
+                {questsWithoutDates.map(quest => (
+                  <div
+                    key={quest.id}
+                    className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                    onClick={() => onQuestClick?.(quest)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Circle className={`w-3 h-3 fill-current ${getPriorityColor(quest.priority)}`} />
+                          <h4 className="font-semibold text-sm">{quest.name}</h4>
+                        </div>
+                        {quest.description && (
+                          <p className="text-xs text-muted-foreground mb-2">{quest.description}</p>
+                        )}
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs">{quest.category}</Badge>
+                          {quest.priority && (
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {quest.priority}
+                            </Badge>
+                          )}
+                          <Badge variant="outline" className="text-xs">{quest.xp} XP</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {questsForSelectedDate.length === 0 && questsWithoutDates.length === 0 && (
+              <p className="text-muted-foreground text-center py-8">
+                No active quests
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
