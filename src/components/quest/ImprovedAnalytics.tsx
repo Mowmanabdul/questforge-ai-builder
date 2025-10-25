@@ -278,37 +278,32 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                   <CardDescription>Your wealth management</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {goldFlowData.some(d => d.value > 0) ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={goldFlowData}>
-                        <XAxis 
-                          dataKey="name" 
-                          stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
-                        />
-                        <YAxis 
-                          stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
-                        />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--card))', 
-                            border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px'
-                          }} 
-                        />
-                        <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                          {goldFlowData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                      Start completing quests to track gold
-                    </div>
-                  )}
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={goldFlowData}>
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="hsl(var(--muted-foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))"
+                        style={{ fontSize: '12px' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }} 
+                      />
+                      <Legend />
+                      <Bar dataKey="value" radius={[8, 8, 0, 0]} name="Gold">
+                        {goldFlowData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
 
