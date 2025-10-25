@@ -18,12 +18,19 @@ export const CalendarView = ({ quests, onQuestClick }: CalendarViewProps) => {
   const questsWithDates = quests.filter(q => !q.completed && q.dueDate);
   
   const questsForSelectedDate = selectedDate
-    ? questsWithDates.filter(q => q.dueDate && isSameDay(new Date(q.dueDate), selectedDate))
+    ? questsWithDates.filter(q => {
+        if (!q.dueDate) return false;
+        const questDate = q.dueDate instanceof Date ? q.dueDate : new Date(q.dueDate);
+        return isSameDay(questDate, selectedDate);
+      })
     : [];
 
   const datesWithQuests = questsWithDates
-    .map(q => q.dueDate)
-    .filter((date): date is Date => date !== undefined);
+    .map(q => {
+      if (!q.dueDate) return null;
+      return q.dueDate instanceof Date ? q.dueDate : new Date(q.dueDate);
+    })
+    .filter((date): date is Date => date !== null && date !== undefined);
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
@@ -43,12 +50,12 @@ export const CalendarView = ({ quests, onQuestClick }: CalendarViewProps) => {
             Quest Calendar
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex justify-center">
+        <CardContent className="p-0">
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
-            className="rounded-md border w-full"
+            className="w-full scale-110 origin-center"
             modifiers={{
               hasQuest: datesWithQuests
             }}
