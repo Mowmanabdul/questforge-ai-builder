@@ -91,6 +91,7 @@ const Index = () => {
         category: quest.category,
         xp: quest.xp,
         priority: quest.priority || 'medium',
+        due_date: quest.dueDate?.toISOString(),
       }).select().single();
 
       if (error) throw error;
@@ -110,6 +111,7 @@ const Index = () => {
         category: updates.category,
         xp: updates.xp,
         priority: updates.priority,
+        due_date: updates.dueDate?.toISOString(),
       };
 
       // Handle due date
