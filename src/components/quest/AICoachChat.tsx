@@ -306,21 +306,29 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
   };
 
   return (
-    <Card className="glass-card border-primary/30 shadow-glow h-[600px] flex flex-col">
-      <CardHeader>
+    <Card className="glass-card border-primary/40 glow-primary h-[650px] flex flex-col overflow-hidden">
+      <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            <CardTitle className="text-xl">AI Productivity Coach</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            </div>
+            <div>
+              <CardTitle className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                AI Productivity Coach
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">Your strategic quest advisor</p>
+            </div>
           </div>
           {questContext && onClearContext && (
-            <Button size="sm" variant="ghost" onClick={onClearContext}>
+            <Button size="sm" variant="ghost" onClick={onClearContext} className="hover:bg-primary/10">
               Clear Context
             </Button>
           )}
         </div>
         {questContext && (
-          <Badge variant="outline" className="mt-2">
+          <Badge variant="outline" className="mt-3 border-primary/30 bg-primary/5">
+            <Sparkles className="w-3 h-3 mr-1" />
             Discussing: {questContext.name}
           </Badge>
         )}
@@ -329,54 +337,80 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
         <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.length === 0 && !questContext && (
-              <div className="text-center py-8 text-muted-foreground space-y-4">
-                <div>
-                  <p className="mb-2 text-lg">⚔️ Greetings, Hero!</p>
-                  <p className="text-sm">
-                    I'm Sage, your AI productivity coach. Ready to level up your quest game?
+              <div className="text-center py-12 space-y-6 animate-fade-in">
+                <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border-2 border-primary/30 animate-pulse">
+                  <Sparkles className="w-10 h-10 text-primary" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    ⚔️ Greetings, Hero!
+                  </p>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    I'm Sage, your AI productivity coach. Ready to conquer your goals and level up your quest game?
                   </p>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3 max-w-md mx-auto">
                   <Button
                     onClick={() => handleSpecialRequest('suggest')}
                     variant="outline"
-                    className="w-full"
+                    className="w-full glass-card border-primary/30 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 h-auto py-4"
                     disabled={isLoading}
                   >
-                    <Lightbulb className="w-4 h-4 mr-2" />
-                    ✨ Suggest New Quests
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Lightbulb className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold">✨ Suggest New Quests</div>
+                        <div className="text-xs text-muted-foreground">Get personalized quest ideas</div>
+                      </div>
+                    </div>
                   </Button>
                   <Button
                     onClick={() => handleSpecialRequest('review')}
                     variant="outline"
-                    className="w-full"
+                    className="w-full glass-card border-accent/30 hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 h-auto py-4"
                     disabled={isLoading || activeQuests.length === 0}
                   >
-                    <ListChecks className="w-4 h-4 mr-2" />
-                    📋 Review My Quest Log
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-accent/10">
+                        <ListChecks className="w-5 h-5 text-accent" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold">📋 Review My Quest Log</div>
+                        <div className="text-xs text-muted-foreground">Prioritize your active quests</div>
+                      </div>
+                    </div>
                   </Button>
                   <Button
                     onClick={() => handleSpecialRequest('smart_reminder')}
                     variant="outline"
-                    className="w-full"
+                    className="w-full glass-card border-gold/30 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300 h-auto py-4"
                     disabled={isLoading || activeQuests.length === 0}
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    🎯 What Should I Tackle Next?
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gold/10">
+                        <Sparkles className="w-5 h-5 text-gold" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold">🎯 What Should I Tackle Next?</div>
+                        <div className="text-xs text-muted-foreground">Get smart recommendations</div>
+                      </div>
+                    </div>
                   </Button>
                 </div>
               </div>
             )}
             {messages.map((msg, idx) => (
-              <div key={idx}>
+              <div key={idx} className="animate-fade-in">
                 <div
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-1`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[85%] rounded-2xl p-4 shadow-md transition-all duration-300 hover:shadow-lg ${
                       msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                        ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
+                        : 'bg-gradient-to-br from-muted to-muted/80 border border-border/50'
                     }`}
                   >
                     {msg.role === 'user' ? (
@@ -409,14 +443,17 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                   </div>
                 </div>
                 {msg.subtaskSuggestions && msg.subtaskSuggestions.length > 0 && questContext && onUpdateQuest && (
-                  <div className="mt-3">
-                    <Card className="p-3 bg-muted/50">
-                      <h4 className="font-semibold text-sm mb-2">Suggested Subtasks:</h4>
-                      <ul className="space-y-1 mb-3">
+                  <div className="mt-3 animate-fade-in">
+                    <Card className="glass-card p-4 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+                      <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                        <ListChecks className="w-4 h-4 text-accent" />
+                        Suggested Subtasks:
+                      </h4>
+                      <ul className="space-y-2 mb-4">
                         {msg.subtaskSuggestions.map((subtask, sIdx) => (
-                          <li key={sIdx} className="text-sm flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            {subtask.name}
+                          <li key={sIdx} className="text-sm flex items-center gap-3 p-2 rounded-lg bg-background/50">
+                            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                            <span className="flex-1">{subtask.name}</span>
                           </li>
                         ))}
                       </ul>
@@ -434,35 +471,50 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                             description: `Added ${subtasks.length} subtasks to "${questContext.name}".`,
                           });
                         }}
-                        className="w-full"
+                        className="w-full bg-accent hover:bg-accent/90"
                       >
                         <Plus className="w-3 h-3 mr-1" />
-                        Add All Subtasks
+                        Add All Subtasks to Quest
                       </Button>
                     </Card>
                   </div>
                 )}
                 {msg.questSuggestions && msg.questSuggestions.length > 0 && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-3 space-y-3 animate-fade-in">
                     {msg.questSuggestions.map((suggestion, sIdx) => (
-                      <Card key={sIdx} className="p-3 bg-muted/50">
-                        <div className="flex items-start justify-between gap-3">
+                      <Card key={sIdx} className="glass-card p-4 border-primary/30 hover:border-primary/50 hover:glow-primary transition-all duration-300">
+                        <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
-                            <h4 className="font-semibold text-sm mb-1">{suggestion.name}</h4>
+                            <h4 className="font-semibold text-base mb-2">{suggestion.name}</h4>
                             {suggestion.description && (
-                              <p className="text-xs text-muted-foreground mb-2">{suggestion.description}</p>
+                              <p className="text-sm text-muted-foreground mb-2 leading-relaxed">{suggestion.description}</p>
                             )}
                             <div className="flex gap-2 flex-wrap">
-                              <Badge variant="outline" className="text-xs">{suggestion.category}</Badge>
-                              <Badge variant="outline" className="text-xs">{suggestion.priority}</Badge>
-                              <Badge variant="outline" className="text-xs">{suggestion.xp} XP</Badge>
+                              <Badge variant="outline" className="text-xs border-primary/30 bg-primary/5">
+                                📂 {suggestion.category}
+                              </Badge>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  suggestion.priority === 'high' 
+                                    ? 'border-red-500/30 bg-red-500/5 text-red-500' 
+                                    : suggestion.priority === 'medium'
+                                    ? 'border-yellow-500/30 bg-yellow-500/5 text-yellow-500'
+                                    : 'border-green-500/30 bg-green-500/5 text-green-500'
+                                }`}
+                              >
+                                🎯 {suggestion.priority}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs border-accent/30 bg-accent/5">
+                                ⭐ {suggestion.xp} XP
+                              </Badge>
                             </div>
                           </div>
                           {onAddQuest && (
                             <Button
                               size="sm"
                               onClick={() => handleAddSuggestion(suggestion)}
-                              className="flex-shrink-0"
+                              className="flex-shrink-0 bg-primary hover:bg-primary/90"
                             >
                               <Plus className="w-3 h-3 mr-1" />
                               Add
@@ -484,20 +536,27 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
           </div>
         </ScrollArea>
 
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask your coach anything..."
-            className="min-h-[60px] resize-none"
-            disabled={isLoading}
-          />
+        <div className="flex gap-3 items-end pt-2">
+          <div className="flex-1 relative">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask your coach anything... (Press Enter to send)"
+              className="min-h-[60px] resize-none pr-12 glass-card border-primary/30 focus:border-primary/50 focus:glow-primary transition-all duration-300"
+              disabled={isLoading}
+            />
+            {input.trim() && (
+              <span className="absolute right-3 bottom-3 text-xs text-muted-foreground">
+                ↵ Send
+              </span>
+            )}
+          </div>
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="h-[60px] w-[60px] flex-shrink-0"
+            className="h-[60px] w-[60px] flex-shrink-0 bg-primary hover:bg-primary/90 glow-primary transition-all duration-300"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

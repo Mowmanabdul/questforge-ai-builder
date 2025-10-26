@@ -14,18 +14,20 @@ export const OracleMessage = ({ message }: OracleMessageProps) => {
   if (!visible) return null;
 
   return (
-    <Card className="glass-card p-4 mb-6 border-primary glow-primary animate-fade-in">
+    <Card className="glass-card p-4 mb-6 border-primary/40 glow-primary animate-fade-in hover:border-primary/60 transition-all duration-300">
       <div className="flex items-start gap-3">
-        <Sparkles className="w-6 h-6 text-primary flex-shrink-0 animate-pulse" />
+        <div className="p-2 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex-shrink-0">
+          <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+        </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-primary mb-1">The Oracle Speaks</h3>
-          <p className="text-sm text-foreground">{message.text}</p>
+          <h3 className="font-bold text-primary mb-1.5 text-base">✨ The Oracle Speaks</h3>
+          <p className="text-sm text-foreground leading-relaxed">{message.text}</p>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setVisible(false)}
-          className="flex-shrink-0"
+          className="flex-shrink-0 hover:bg-primary/10"
         >
           <X className="w-4 h-4" />
         </Button>

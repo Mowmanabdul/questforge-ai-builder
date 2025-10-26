@@ -279,25 +279,32 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={goldFlowData}>
+                    <BarChart data={goldFlowData} barSize={80}>
                       <XAxis 
                         dataKey="name" 
                         stroke="hsl(var(--muted-foreground))"
-                        style={{ fontSize: '12px' }}
+                        style={{ fontSize: '14px', fontWeight: 500 }}
                       />
                       <YAxis 
                         stroke="hsl(var(--muted-foreground))"
                         style={{ fontSize: '12px' }}
+                        label={{ value: 'Gold Amount', angle: -90, position: 'insideLeft' }}
                       />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: 'hsl(var(--card))', 
                           border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
+                          borderRadius: '8px',
+                          padding: '12px'
+                        }}
+                        formatter={(value: number) => [value, 'Gold']}
+                        labelFormatter={(label) => `${label} Gold`}
                       />
-                      <Legend />
-                      <Bar dataKey="value" radius={[8, 8, 0, 0]} name="Gold">
+                      <Bar 
+                        dataKey="value" 
+                        radius={[8, 8, 0, 0]} 
+                        label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
+                      >
                         {goldFlowData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
