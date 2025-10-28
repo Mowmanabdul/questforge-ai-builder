@@ -644,7 +644,6 @@ const Index = () => {
 
           <TabsContent value="progress">
             <div className="space-y-6">
-              <DashboardStats player={player} />
               <Armory 
                 inventory={player.inventory}
                 onEquip={equipItem}
