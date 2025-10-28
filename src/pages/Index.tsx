@@ -5,7 +5,6 @@ import { EnhancedQuestList } from "@/components/quest/EnhancedQuestList";
 import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
 import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
 import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
-import { Dashboard } from "@/components/quest/Dashboard";
 import { AICoachChat } from "@/components/quest/AICoachChat";
 import { DashboardStats } from "@/components/quest/DashboardStats";
 import { Armory } from "@/components/quest/Armory";
@@ -25,8 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { CalendarView } from "@/components/quest/CalendarView";
-import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift, Calendar as CalendarIcon } from "lucide-react";
+import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift } from "lucide-react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
@@ -444,15 +442,15 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen p-2 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-br from-background via-background to-primary/5">
       <KeyboardShortcuts 
         onNewQuest={() => document.getElementById('questName')?.focus()}
         onExportData={() => exportToJSON(player, quests)}
       />
       <div className="max-w-7xl mx-auto">
         {/* Header with Settings */}
-        <header className="text-center mb-8 animate-fade-in">
-          <div className="flex justify-between items-center mb-4">
+        <header className="text-center mb-6 sm:mb-8 animate-fade-in">
+          <div className="flex justify-between items-center mb-3 sm:mb-4">
             <div />
             <div className="flex gap-2">
               <Button 
@@ -462,7 +460,7 @@ const Index = () => {
                 className="glass-card border-primary/20 hover:border-destructive/40 transition-all"
                 title="Sign Out"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
               <Sheet>
                 <SheetTrigger asChild>
@@ -471,7 +469,7 @@ const Index = () => {
                     size="icon"
                     className="glass-card border-primary/20 hover:border-primary/40 transition-all"
                   >
-                    <SettingsIcon className="w-5 h-5" />
+                    <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
@@ -492,11 +490,11 @@ const Index = () => {
           </div>
           
           <div className="relative">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent">
               QuestLog
             </h1>
           </div>
-          <p className="text-base sm:text-lg text-muted-foreground">Gamify your life, one quest at a time ⚔️</p>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Gamify your life, one quest at a time ⚔️</p>
         </header>
 
         {/* Oracle Message */}
@@ -511,7 +509,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 sm:grid-cols-8 mb-8 glass-card p-1 gap-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-7 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
@@ -525,13 +523,6 @@ const Index = () => {
             >
               <Target className="w-4 h-4" />
               <span className="hidden xs:inline">Quests</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="calendar" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
-            >
-              <CalendarIcon className="w-4 h-4" />
-              <span className="hidden xs:inline">Calendar</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
@@ -572,11 +563,24 @@ const Index = () => {
 
           <TabsContent value="home">
             {dataLoading ? (
-              <DashboardSkeleton />
+              <QuestListSkeleton />
             ) : (
               <div className="space-y-6">
                 <DailyWisdom />
-                <Dashboard player={player} quests={quests} dailyFocus={dailyFocus} />
+                <EnhancedAddQuestForm onAddQuest={addQuest} />
+                <EnhancedQuestList 
+                  quests={quests} 
+                  dailyFocus={dailyFocus}
+                  onCompleteQuest={completeQuest}
+                  onDeleteQuest={handleDeleteQuest}
+                  onEditQuest={handleEditQuest}
+                  onAskAICoach={handleAskAICoach}
+                  onRushQuest={handleRushQuest}
+                  dailyRushUsed={player.dailyRushUsed}
+                  chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
+                  selectedQuests={selectedQuests}
+                  onSelectQuest={handleSelectQuest}
+                />
               </div>
             )}
           </TabsContent>
@@ -601,13 +605,6 @@ const Index = () => {
                 onBulkComplete={handleBulkComplete}
               />
             )}
-          </TabsContent>
-
-          <TabsContent value="calendar">
-            <CalendarView 
-              quests={quests}
-              onQuestClick={(quest) => handleEditQuest(quest.id)}
-            />
           </TabsContent>
 
           <TabsContent value="archive">

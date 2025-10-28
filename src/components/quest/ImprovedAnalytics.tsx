@@ -76,90 +76,92 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Quick Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="glass-card border-primary/30">
-          <CardContent className="pt-6 text-center">
-            <Award className="w-8 h-8 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">{player.level}</div>
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <Award className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-primary" />
+            <div className="text-xl sm:text-2xl font-bold">{player.level}</div>
             <div className="text-xs text-muted-foreground">Level</div>
           </CardContent>
         </Card>
         <Card className="glass-card border-accent/30">
-          <CardContent className="pt-6 text-center">
-            <TrendingUp className="w-8 h-8 mx-auto mb-2 text-accent" />
-            <div className="text-2xl font-bold">{player.xp}</div>
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-accent" />
+            <div className="text-xl sm:text-2xl font-bold">{player.xp}</div>
             <div className="text-xs text-muted-foreground">Total XP</div>
           </CardContent>
         </Card>
         <Card className="glass-card border-gold/30">
-          <CardContent className="pt-6 text-center">
-            <Coins className="w-8 h-8 mx-auto mb-2 text-gold" />
-            <div className="text-2xl font-bold">{player.gold}</div>
-            <div className="text-xs text-muted-foreground">Current Gold</div>
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <Coins className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-gold" />
+            <div className="text-xl sm:text-2xl font-bold">{player.gold}</div>
+            <div className="text-xs text-muted-foreground">Gold</div>
           </CardContent>
         </Card>
         <Card className="glass-card border-leisure/30">
-          <CardContent className="pt-6 text-center">
-            <Zap className="w-8 h-8 mx-auto mb-2 text-leisure" />
-            <div className="text-2xl font-bold">{player.streak}</div>
-            <div className="text-xs text-muted-foreground">Day Streak</div>
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <Zap className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-leisure" />
+            <div className="text-xl sm:text-2xl font-bold">{player.streak}</div>
+            <div className="text-xs text-muted-foreground">Streak</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Tabbed Analytics */}
       <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="text-2xl">Analytics Dashboard</CardTitle>
-          <CardDescription>Explore your progress from different angles</CardDescription>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl">Analytics</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Track your progress</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-6">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Overview</span>
+            <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6">
+              <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Overview</span>
               </TabsTrigger>
-              <TabsTrigger value="quests" className="flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Quests</span>
+              <TabsTrigger value="quests" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <PieChartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Quests</span>
               </TabsTrigger>
-              <TabsTrigger value="economy" className="flex items-center gap-2">
-                <Coins className="w-4 h-4" />
-                <span className="hidden sm:inline">Economy</span>
+              <TabsTrigger value="economy" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Economy</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
+            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Activity className="w-5 h-5 text-accent" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                     30-Day Activity
                   </CardTitle>
-                  <CardDescription>Your consistency over the last month</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Your consistency</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-2 sm:px-6">
                   {last30Days.some(d => d.quests > 0) ? (
-                    <ResponsiveContainer width="100%" height={250}>
+                    <ResponsiveContainer width="100%" height={200}>
                       <LineChart data={last30Days}>
                         <XAxis 
                           dataKey="date" 
                           stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
+                          interval="preserveStartEnd"
                         />
                         <YAxis 
                           stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'hsl(var(--card))', 
                             border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            fontSize: '12px'
                           }} 
                         />
                         <Line 
@@ -167,54 +169,56 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                           dataKey="quests" 
                           stroke="hsl(var(--primary))" 
                           strokeWidth={2}
-                          name="Quests Completed"
+                          name="Quests"
+                          dot={false}
                         />
                       </LineChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                      Complete quests to see your trend
+                    <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs sm:text-sm">
+                      Complete quests to see trend
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Zap className="w-5 h-5 text-accent" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                     7-Day Activity
                   </CardTitle>
-                  <CardDescription>Your performance this week</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">This week</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-2 sm:px-6">
                   {last7Days.some(d => d.xp > 0) ? (
-                    <ResponsiveContainer width="100%" height={250}>
+                    <ResponsiveContainer width="100%" height={200}>
                       <BarChart data={last7Days}>
                         <XAxis 
                           dataKey="day" 
                           stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <YAxis 
                           stroke="hsl(var(--muted-foreground))"
-                          style={{ fontSize: '12px' }}
+                          style={{ fontSize: '10px' }}
                         />
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'hsl(var(--card))', 
                             border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            fontSize: '12px'
                           }} 
                         />
-                        <Legend />
-                        <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} name="XP Earned" />
-                        <Bar dataKey="quests" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} name="Quests Done" />
+                        <Legend wrapperStyle={{ fontSize: '11px' }} />
+                        <Bar dataKey="xp" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} name="XP" />
+                        <Bar dataKey="quests" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} name="Quests" />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                      Complete quests this week to see your activity
+                    <div className="h-[200px] flex items-center justify-center text-muted-foreground text-xs sm:text-sm">
+                      Complete quests this week
                     </div>
                   )}
                 </CardContent>
@@ -224,26 +228,27 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
             {/* Quests Tab */}
             <TabsContent value="quests">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="w-5 h-5 text-primary" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                     Quest Distribution
                   </CardTitle>
-                  <CardDescription>Your focus across different categories</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">By category</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-2 sm:px-6">
                   {categoryData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={350}>
+                    <ResponsiveContainer width="100%" height={280}>
                       <PieChart>
                         <Pie
                           data={categoryData}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                          outerRadius={120}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={90}
                           fill="#8884d8"
                           dataKey="value"
+                          style={{ fontSize: '11px' }}
                         >
                           {categoryData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -253,14 +258,15 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                           contentStyle={{ 
                             backgroundColor: 'hsl(var(--card))', 
                             border: '1px solid hsl(var(--border))',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            fontSize: '12px'
                           }} 
                         />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
-                    <div className="h-[350px] flex items-center justify-center text-muted-foreground">
-                      Complete quests to see your distribution
+                    <div className="h-[280px] flex items-center justify-center text-muted-foreground text-xs sm:text-sm">
+                      Complete quests to see distribution
                     </div>
                   )}
                 </CardContent>
@@ -268,42 +274,41 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
             </TabsContent>
 
             {/* Economy Tab */}
-            <TabsContent value="economy" className="space-y-6">
+            <TabsContent value="economy" className="space-y-4 sm:space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Coins className="w-5 h-5 text-gold" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
                     Gold Flow
                   </CardTitle>
-                  <CardDescription>Your wealth management</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Wealth management</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={goldFlowData} barSize={80}>
+                <CardContent className="px-2 sm:px-6">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <BarChart data={goldFlowData} barSize={60}>
                       <XAxis 
                         dataKey="name" 
                         stroke="hsl(var(--muted-foreground))"
-                        style={{ fontSize: '14px', fontWeight: 500 }}
+                        style={{ fontSize: '11px', fontWeight: 500 }}
                       />
                       <YAxis 
                         stroke="hsl(var(--muted-foreground))"
-                        style={{ fontSize: '12px' }}
-                        label={{ value: 'Gold Amount', angle: -90, position: 'insideLeft' }}
+                        style={{ fontSize: '10px' }}
                       />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: 'hsl(var(--card))', 
                           border: '1px solid hsl(var(--border))',
                           borderRadius: '8px',
-                          padding: '12px'
+                          padding: '8px',
+                          fontSize: '12px'
                         }}
                         formatter={(value: number) => [value, 'Gold']}
-                        labelFormatter={(label) => `${label} Gold`}
                       />
                       <Bar 
                         dataKey="value" 
                         radius={[8, 8, 0, 0]} 
-                        label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 14, fontWeight: 'bold' }}
+                        label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 12, fontWeight: 'bold' }}
                       >
                         {goldFlowData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -314,23 +319,23 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
                 </CardContent>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <Card className="glass-card border-gold/30">
-                  <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-gold">{goldEarned}</div>
-                    <div className="text-sm text-muted-foreground mt-1">Total Earned</div>
+                  <CardContent className="pt-4 sm:pt-6 text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-gold">{goldEarned}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Earned</div>
                   </CardContent>
                 </Card>
                 <Card className="glass-card border-leisure/30">
-                  <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-leisure">{goldSpent}</div>
-                    <div className="text-sm text-muted-foreground mt-1">Total Spent</div>
+                  <CardContent className="pt-4 sm:pt-6 text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-leisure">{goldSpent}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Spent</div>
                   </CardContent>
                 </Card>
                 <Card className="glass-card border-primary/30">
-                  <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-primary">{player.gold}</div>
-                    <div className="text-sm text-muted-foreground mt-1">Current Balance</div>
+                  <CardContent className="pt-4 sm:pt-6 text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-primary">{player.gold}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Balance</div>
                   </CardContent>
                 </Card>
               </div>
