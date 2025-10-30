@@ -563,24 +563,12 @@ const Index = () => {
 
           <TabsContent value="home">
             {dataLoading ? (
-              <QuestListSkeleton />
+              <DashboardSkeleton />
             ) : (
               <div className="space-y-6">
                 <DailyWisdom />
-                <EnhancedAddQuestForm onAddQuest={addQuest} />
-                <EnhancedQuestList 
-                  quests={quests} 
-                  dailyFocus={dailyFocus}
-                  onCompleteQuest={completeQuest}
-                  onDeleteQuest={handleDeleteQuest}
-                  onEditQuest={handleEditQuest}
-                  onAskAICoach={handleAskAICoach}
-                  onRushQuest={handleRushQuest}
-                  dailyRushUsed={player.dailyRushUsed}
-                  chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
-                  selectedQuests={selectedQuests}
-                  onSelectQuest={handleSelectQuest}
-                />
+                <DashboardStats player={player} />
+                <ImprovedAnalytics player={player} />
               </div>
             )}
           </TabsContent>
