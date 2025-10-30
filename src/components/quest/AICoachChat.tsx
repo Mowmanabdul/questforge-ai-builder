@@ -343,11 +343,14 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                 </div>
                 <div className="space-y-2">
                   <p className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    ⚔️ Greetings, Hero!
+                    ⚔️ Ready to Level Up?
                   </p>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    I'm Sage, your AI productivity coach. Ready to conquer your goals and level up your quest game?
+                    I'm Sage, your strategic AI coach. I analyze your progress, break down complex quests, and help you prioritize like a pro.
                   </p>
+                  <div className="text-xs text-muted-foreground/70 max-w-md mx-auto pt-2">
+                    💡 Level {player.level} | {player.stats.questsCompleted || 0} quests completed | {player.streak || 0}-day streak
+                  </div>
                 </div>
                 <div className="flex flex-col gap-3 max-w-md mx-auto">
                   <Button
@@ -361,8 +364,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                         <Lightbulb className="w-5 h-5 text-primary" />
                       </div>
                       <div className="text-left">
-                        <div className="font-semibold">✨ Suggest New Quests</div>
-                        <div className="text-xs text-muted-foreground">Get personalized quest ideas</div>
+                        <div className="font-semibold">✨ Smart Quest Suggestions</div>
+                        <div className="text-xs text-muted-foreground">AI-powered quest ideas based on your profile</div>
                       </div>
                     </div>
                   </Button>
@@ -377,8 +380,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                         <ListChecks className="w-5 h-5 text-accent" />
                       </div>
                       <div className="text-left">
-                        <div className="font-semibold">📋 Review My Quest Log</div>
-                        <div className="text-xs text-muted-foreground">Prioritize your active quests</div>
+                        <div className="font-semibold">📋 Strategic Quest Review</div>
+                        <div className="text-xs text-muted-foreground">Get portfolio analysis & prioritization</div>
                       </div>
                     </div>
                   </Button>
@@ -393,8 +396,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                         <Sparkles className="w-5 h-5 text-gold" />
                       </div>
                       <div className="text-left">
-                        <div className="font-semibold">🎯 What Should I Tackle Next?</div>
-                        <div className="text-xs text-muted-foreground">Get smart recommendations</div>
+                        <div className="font-semibold">🎯 Priority Advisor</div>
+                        <div className="text-xs text-muted-foreground">Data-driven next-quest recommendation</div>
                       </div>
                     </div>
                   </Button>
