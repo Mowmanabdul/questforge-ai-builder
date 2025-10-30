@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Send, Sparkles, Loader2, Lightbulb, ListChecks, Plus } from "lucide-react";
+import { Send, Sparkles, Loader2, Lightbulb, ListChecks, Plus, RotateCcw } from "lucide-react";
 import { Player, Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -305,27 +305,49 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
     }
   };
 
+  const handleResetConversation = () => {
+    setMessages([]);
+    localStorage.removeItem('ai_coach_history');
+    toast({
+      title: "Conversation Reset",
+      description: "Your chat history has been cleared.",
+    });
+  };
+
   return (
     <Card className="glass-card border-primary/40 glow-primary h-[650px] flex flex-col overflow-hidden">
       <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  AI Productivity Coach
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">Your strategic quest advisor</p>
+              </div>
             </div>
-            <div>
-              <CardTitle className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                AI Productivity Coach
-              </CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Your strategic quest advisor</p>
+            <div className="flex gap-2">
+              {messages.length > 0 && (
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={handleResetConversation}
+                  className="hover:bg-destructive/10 hover:text-destructive"
+                  title="Reset conversation"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+              )}
+              {questContext && onClearContext && (
+                <Button size="sm" variant="ghost" onClick={onClearContext} className="hover:bg-primary/10">
+                  Clear Context
+                </Button>
+              )}
             </div>
           </div>
-          {questContext && onClearContext && (
-            <Button size="sm" variant="ghost" onClick={onClearContext} className="hover:bg-primary/10">
-              Clear Context
-            </Button>
-          )}
-        </div>
         {questContext && (
           <Badge variant="outline" className="mt-3 border-primary/30 bg-primary/5">
             <Sparkles className="w-3 h-3 mr-1" />
