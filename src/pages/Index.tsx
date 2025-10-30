@@ -7,9 +7,7 @@ import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
 import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
 import { AICoachChat } from "@/components/quest/AICoachChat";
 import { DashboardStats } from "@/components/quest/DashboardStats";
-import { Armory } from "@/components/quest/Armory";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
-import { AchievementsGallery } from "@/components/quest/achievements/AchievementsGallery";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
@@ -24,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Home, Target, TrendingUp, Settings as SettingsIcon, Sparkles, BarChart3, LogOut, Loader2, Archive, Gift } from "lucide-react";
+import { Home, Target, Archive as ArchiveIcon, Sparkles, Gift, Settings as SettingsIcon, LogOut, Loader2 } from "lucide-react";
 import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
@@ -509,7 +507,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-7 mb-8 glass-card p-1 gap-1">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-5 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
@@ -528,7 +526,7 @@ const Index = () => {
               value="archive" 
               className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
             >
-              <Archive className="w-4 h-4" />
+              <ArchiveIcon className="w-4 h-4" />
               <span className="hidden xs:inline">Archive</span>
             </TabsTrigger>
             <TabsTrigger 
@@ -544,20 +542,6 @@ const Index = () => {
             >
               <Gift className="w-4 h-4" />
               <span className="hidden xs:inline">Rewards</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="progress" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span className="hidden xs:inline">Progress</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analytics" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden xs:inline">Stats</span>
             </TabsTrigger>
           </TabsList>
 
@@ -628,21 +612,6 @@ const Index = () => {
               onUpdateReward={updateCustomReward}
               onDeleteReward={deleteCustomReward}
             />
-          </TabsContent>
-
-          <TabsContent value="progress">
-            <div className="space-y-6">
-              <Armory 
-                inventory={player.inventory}
-                onEquip={equipItem}
-                onUnequip={unequipItem}
-              />
-              <AchievementsGallery achievements={player.achievements} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <ImprovedAnalytics player={player} />
           </TabsContent>
         </Tabs>
 
