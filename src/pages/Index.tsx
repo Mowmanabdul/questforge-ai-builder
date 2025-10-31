@@ -12,6 +12,9 @@ import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
+import { KeyboardShortcutsHelp } from "@/components/quest/KeyboardShortcutsHelp";
+import { QuickActions } from "@/components/quest/QuickActions";
+import { EmptyStateGuide } from "@/components/quest/EmptyStateGuide";
 import { Settings } from "@/components/quest/Settings";
 import { QuestListSkeleton } from "@/components/quest/QuestListSkeleton";
 import { DashboardSkeleton } from "@/components/quest/DashboardSkeleton";
@@ -451,6 +454,7 @@ const Index = () => {
           <div className="flex justify-between items-center mb-3 sm:mb-4">
             <div />
             <div className="flex gap-2">
+              <KeyboardShortcutsHelp />
               <Button 
                 variant="outline" 
                 size="icon"
@@ -488,11 +492,20 @@ const Index = () => {
           </div>
           
           <div className="relative">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent animate-fade-in">
               QuestLog
             </h1>
+            {player.prestigeLevel > 0 && (
+              <div className="absolute -top-2 -right-2 px-3 py-1 bg-gradient-to-r from-secondary to-gold rounded-full border border-secondary/50 animate-pulse">
+                <span className="text-xs font-bold text-secondary-foreground">
+                  Prestige {player.prestigeLevel}
+                </span>
+              </div>
+            )}
           </div>
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Gamify your life, one quest at a time ⚔️</p>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            Gamify your life, one quest at a time ⚔️
+          </p>
         </header>
 
         {/* Oracle Message */}
@@ -510,35 +523,35 @@ const Index = () => {
           <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-5 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
             >
               <Home className="w-4 h-4" />
               <span className="hidden xs:inline">Home</span>
             </TabsTrigger>
             <TabsTrigger 
               value="quests" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
             >
               <Target className="w-4 h-4" />
               <span className="hidden xs:inline">Quests</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
             >
               <ArchiveIcon className="w-4 h-4" />
               <span className="hidden xs:inline">Archive</span>
             </TabsTrigger>
             <TabsTrigger 
               value="coach" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
             >
               <Sparkles className="w-4 h-4" />
               <span className="hidden xs:inline">AI Coach</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rewards" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm"
+              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
             >
               <Gift className="w-4 h-4" />
               <span className="hidden xs:inline">Rewards</span>
@@ -558,6 +571,12 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="quests" className="space-y-6">
+            {quests.length === 0 && !dataLoading ? (
+              <>
+                <EmptyStateGuide onGetStarted={() => document.getElementById('questName')?.focus()} />
+                <QuickActions onAddQuest={addQuest} />
+              </>
+            ) : null}
             <EnhancedAddQuestForm onAddQuest={addQuest} />
             {dataLoading ? (
               <QuestListSkeleton />
@@ -629,17 +648,25 @@ const Index = () => {
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={!!deleteConfirmQuest} onOpenChange={(open) => !open && setDeleteConfirmQuest(null)}>
-          <AlertDialogContent>
+          <AlertDialogContent className="glass-card">
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will delete the quest. You won't be able to undo this action.
+              <AlertDialogTitle className="text-xl flex items-center gap-2">
+                <div className="p-2 rounded-full bg-destructive/10">
+                  <Target className="w-5 h-5 text-destructive" />
+                </div>
+                Delete Quest?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-base">
+                This will permanently delete the quest. This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => deleteConfirmQuest && deleteQuest(deleteConfirmQuest)}>
-                Delete
+              <AlertDialogCancel className="hover:bg-muted">Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => deleteConfirmQuest && deleteQuest(deleteConfirmQuest)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete Quest
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

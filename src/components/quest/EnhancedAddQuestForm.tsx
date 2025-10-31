@@ -50,10 +50,17 @@ export const EnhancedAddQuestForm = ({ onAddQuest }: EnhancedAddQuestFormProps) 
   };
 
   return (
-    <Card className="glass-card">
-      <CardHeader>
-        <CardTitle>Add New Quest</CardTitle>
-        <CardDescription>Create a new quest to complete</CardDescription>
+    <Card className="glass-card border-primary/20 hover:border-primary/30 transition-all">
+      <CardHeader className="border-b border-primary/10">
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <PlusCircle className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <CardTitle>Add New Quest</CardTitle>
+            <CardDescription>Create a new quest to complete</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

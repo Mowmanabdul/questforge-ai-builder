@@ -60,19 +60,20 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="glass-card w-full max-w-md border-primary/20">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-20" />
+      <Card className="glass-card w-full max-w-md border-primary/20 relative animate-fade-in glow-primary">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary/10 rounded-full">
-              <Sword className="w-8 h-8 text-primary" />
+            <div className="p-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full border border-primary/30 animate-pulse">
+              <Sword className="w-10 h-10 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+          <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent mb-2">
             QuestLog
           </CardTitle>
-          <CardDescription>
-            Begin your journey of gamified productivity
+          <CardDescription className="text-base">
+            Begin your journey of gamified productivity ⚔️
           </CardDescription>
         </CardHeader>
         <CardContent>
