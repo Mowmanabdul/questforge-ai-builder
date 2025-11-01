@@ -315,8 +315,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
   };
 
   return (
-    <Card className="glass-card border-primary/40 glow-primary h-[650px] flex flex-col overflow-hidden">
-      <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+    <Card className="glass-card border-primary/40 glow-primary h-[calc(100vh-12rem)] md:h-[650px] flex flex-col overflow-hidden">
+      <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5 py-3 md:py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
@@ -355,8 +355,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-4 min-h-0">
-        <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
+      <CardContent className="flex-1 flex flex-col gap-4 min-h-0 p-3 md:p-6">
+        <ScrollArea className="flex-1 pr-2 md:pr-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.length === 0 && !questContext && (
               <div className="text-center py-12 space-y-6 animate-fade-in">
@@ -432,7 +432,7 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-1`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl p-4 shadow-md transition-all duration-300 hover:shadow-lg ${
+                    className={`max-w-[85%] rounded-2xl p-3 md:p-4 shadow-md transition-all duration-300 hover:shadow-lg ${
                       msg.role === 'user'
                         ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
                         : 'bg-gradient-to-br from-muted to-muted/80 border border-border/50'

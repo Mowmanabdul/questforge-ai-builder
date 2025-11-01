@@ -354,13 +354,9 @@ export const ImprovedRewards = ({
           <CardContent className="py-12 text-center">
             <Sparkles className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No rewards yet</h3>
-            <p className="text-muted-foreground mb-6">
-              Create your first reward to start working towards something you enjoy!
+            <p className="text-muted-foreground">
+              Click the "Add Reward" button above to create your first reward!
             </p>
-            <Button onClick={() => setIsDialogOpen(true)} size="lg">
-              <Plus className="w-5 h-5 mr-2" />
-              Create Your First Reward
-            </Button>
           </CardContent>
         </Card>
       )}

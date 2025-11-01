@@ -13,7 +13,6 @@ import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
 import { KeyboardShortcuts } from "@/components/quest/KeyboardShortcuts";
 import { KeyboardShortcutsHelp } from "@/components/quest/KeyboardShortcutsHelp";
-import { QuickActions } from "@/components/quest/QuickActions";
 import { EmptyStateGuide } from "@/components/quest/EmptyStateGuide";
 import { Settings } from "@/components/quest/Settings";
 import { QuestListSkeleton } from "@/components/quest/QuestListSkeleton";
@@ -573,10 +572,7 @@ const Index = () => {
 
           <TabsContent value="quests" className="space-y-6">
             {quests.length === 0 && !dataLoading ? (
-              <>
-                <EmptyStateGuide onGetStarted={() => document.getElementById('questName')?.focus()} />
-                <QuickActions onAddQuest={addQuest} />
-              </>
+              <EmptyStateGuide onGetStarted={() => document.getElementById('questName')?.focus()} />
             ) : null}
             <EnhancedAddQuestForm onAddQuest={addQuest} />
             {dataLoading ? (
