@@ -68,10 +68,10 @@ export const EmptyStateGuide = ({ onGetStarted }: EmptyStateGuideProps) => {
           <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/20 text-left">
             <p className="text-xs font-semibold text-foreground mb-2">💡 Quick Tips:</p>
             <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Use Quick Quest Templates below for instant setup</li>
-              <li>• Higher priority quests give more XP</li>
+              <li>• Set priorities: Higher priority quests give more XP</li>
               <li>• Complete quests daily to maintain your streak</li>
               <li>• Ask the AI Coach for personalized suggestions</li>
+              <li>• Check the rewards section for motivation boosts</li>
             </ul>
           </div>
         </div>

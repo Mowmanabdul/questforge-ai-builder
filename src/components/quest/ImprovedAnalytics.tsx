@@ -275,50 +275,6 @@ export const ImprovedAnalytics = ({ player }: ImprovedAnalyticsProps) => {
 
             {/* Economy Tab */}
             <TabsContent value="economy" className="space-y-4 sm:space-y-6">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-                    Gold Flow
-                  </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Wealth management</CardDescription>
-                </CardHeader>
-                <CardContent className="px-2 sm:px-6">
-                  <ResponsiveContainer width="100%" height={240}>
-                    <BarChart data={goldFlowData} barSize={60}>
-                      <XAxis 
-                        dataKey="name" 
-                        stroke="hsl(var(--muted-foreground))"
-                        style={{ fontSize: '11px', fontWeight: 500 }}
-                      />
-                      <YAxis 
-                        stroke="hsl(var(--muted-foreground))"
-                        style={{ fontSize: '10px' }}
-                      />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          padding: '8px',
-                          fontSize: '12px'
-                        }}
-                        formatter={(value: number) => [value, 'Gold']}
-                      />
-                      <Bar 
-                        dataKey="value" 
-                        radius={[8, 8, 0, 0]} 
-                        label={{ position: 'top', fill: 'hsl(var(--foreground))', fontSize: 12, fontWeight: 'bold' }}
-                      >
-                        {goldFlowData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <Card className="glass-card border-gold/30">
                   <CardContent className="pt-4 sm:pt-6 text-center">
