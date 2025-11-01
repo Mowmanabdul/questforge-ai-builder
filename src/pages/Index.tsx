@@ -443,7 +443,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8 bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen p-3 sm:p-4 md:p-6 lg:p-8 pb-24 md:pb-8 bg-gradient-to-br from-background via-background to-primary/5">
       <KeyboardShortcuts 
         onNewQuest={() => document.getElementById('questName')?.focus()}
         onExportData={() => exportToJSON(player, quests)}
@@ -520,41 +520,42 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-3 sm:grid-cols-5 mb-8 glass-card p-1 gap-1">
+          {/* Desktop Navigation - Hidden on mobile */}
+          <TabsList className="hidden md:grid w-full max-w-4xl mx-auto grid-cols-5 mb-8 glass-card p-1 gap-1">
             <TabsTrigger 
               value="home" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
               <Home className="w-4 h-4" />
-              <span className="hidden xs:inline">Home</span>
+              <span>Home</span>
             </TabsTrigger>
             <TabsTrigger 
               value="quests" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
               <Target className="w-4 h-4" />
-              <span className="hidden xs:inline">Quests</span>
+              <span>Quests</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
               <ArchiveIcon className="w-4 h-4" />
-              <span className="hidden xs:inline">Archive</span>
+              <span>Archive</span>
             </TabsTrigger>
             <TabsTrigger 
               value="coach" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
               <Sparkles className="w-4 h-4" />
-              <span className="hidden xs:inline">AI Coach</span>
+              <span>AI Coach</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rewards" 
-              className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-xs sm:text-sm hover:bg-primary/10"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
               <Gift className="w-4 h-4" />
-              <span className="hidden xs:inline">Rewards</span>
+              <span>Rewards</span>
             </TabsTrigger>
           </TabsList>
 
@@ -633,6 +634,69 @@ const Index = () => {
             />
           </TabsContent>
         </Tabs>
+
+        {/* Mobile Bottom Navigation - Fixed at bottom */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
+          <div className="glass-card border-t border-primary/20 px-2 py-3">
+            <div className="flex justify-around items-center max-w-lg mx-auto">
+              <button
+                onClick={() => setActiveTab('home')}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'home' 
+                    ? 'bg-primary text-primary-foreground scale-110' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Home className="w-5 h-5" />
+                <span className="text-xs font-medium">Home</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('quests')}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'quests' 
+                    ? 'bg-primary text-primary-foreground scale-110' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Target className="w-5 h-5" />
+                <span className="text-xs font-medium">Quests</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('archive')}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'archive' 
+                    ? 'bg-primary text-primary-foreground scale-110' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <ArchiveIcon className="w-5 h-5" />
+                <span className="text-xs font-medium">Archive</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('coach')}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'coach' 
+                    ? 'bg-primary text-primary-foreground scale-110' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Sparkles className="w-5 h-5" />
+                <span className="text-xs font-medium">Coach</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('rewards')}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
+                  activeTab === 'rewards' 
+                    ? 'bg-primary text-primary-foreground scale-110' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                <Gift className="w-5 h-5" />
+                <span className="text-xs font-medium">Rewards</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Edit Quest Dialog */}
         {editingQuest && (
