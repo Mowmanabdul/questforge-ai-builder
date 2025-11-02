@@ -339,7 +339,7 @@ export const EnhancedQuestList = ({
                     <Button
                       size="sm"
                       onClick={() => onCompleteQuest(quest.id)}
-                      className="flex-1 sm:flex-initial hover-scale-smooth min-h-9 sm:min-h-10"
+                      className="flex-1 sm:flex-initial hover-scale-smooth min-h-10 sm:min-h-11 font-semibold"
                     >
                       <CheckCircle2 className="w-4 h-4 sm:mr-1.5" />
                       <span className="hidden sm:inline text-xs sm:text-sm">Complete</span>

@@ -14,6 +14,17 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const getPasswordStrength = (pwd: string): { strength: number; label: string; color: string } => {
+    if (pwd.length === 0) return { strength: 0, label: '', color: '' };
+    if (pwd.length < 6) return { strength: 25, label: 'Weak', color: 'bg-destructive' };
+    if (pwd.length < 10) return { strength: 50, label: 'Fair', color: 'bg-gold' };
+    if (pwd.length < 14) return { strength: 75, label: 'Good', color: 'bg-insight' };
+    return { strength: 100, label: 'Strong', color: 'bg-primary' };
+  };
+
+  const passwordStrength = getPasswordStrength(password);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,17 +160,40 @@ export default function Auth() {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="signup-password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       required
                       minLength={6}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? "👁️" : "👁️‍🗨️"}
+                    </button>
                   </div>
+                  {password && (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Password strength:</span>
+                        <span className={`font-semibold ${passwordStrength.label === 'Strong' ? 'text-primary' : passwordStrength.label === 'Good' ? 'text-insight' : 'text-muted-foreground'}`}>
+                          {passwordStrength.label}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full ${passwordStrength.color} transition-all duration-300`}
+                          style={{ width: `${passwordStrength.strength}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground">
-                    Minimum 6 characters
+                    Use 10+ characters for better security
                   </p>
                 </div>
                 <Button
