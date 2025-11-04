@@ -191,18 +191,34 @@ const Index = () => {
 
       if (questError) throw questError;
 
-      // Calculate rewards (simplified version)
+      // Calculate rewards
       const goldReward = Math.floor(quest.xp / 10);
       
-      // Update profile
-      const newXp = player.xp + quest.xp;
+      // Calculate level ups
+      let newXp = player.xp + quest.xp;
+      let newLevel = player.level;
+      let xpForNextLevel = player.level * 100;
+      
+      // Process level ups
+      while (newXp >= xpForNextLevel) {
+        newXp -= xpForNextLevel;
+        newLevel++;
+        xpForNextLevel = newLevel * 100;
+        
+        toast.success(`🎉 Level Up! You are now Level ${newLevel}!`, {
+          duration: 3000,
+        });
+      }
+      
       const newGold = player.gold + goldReward;
       const newQuestsCompleted = player.stats.questsCompleted + 1;
 
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
+          level: newLevel,
           xp: newXp,
+          xp_to_next: xpForNextLevel,
           gold: newGold,
           quests_completed: newQuestsCompleted,
           total_xp: player.stats.totalXp + quest.xp,

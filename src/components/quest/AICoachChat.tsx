@@ -364,15 +364,15 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                   <Sparkles className="w-10 h-10 text-primary" />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    ⚔️ Ready to Level Up?
-                  </p>
-                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    I'm Sage, your strategic AI coach. I analyze your progress, break down complex quests, and help you prioritize like a pro.
-                  </p>
-                  <div className="text-xs text-muted-foreground/70 max-w-md mx-auto pt-2">
-                    💡 Level {player.level} | {player.stats.questsCompleted || 0} quests completed | {player.streak || 0}-day streak
-                  </div>
+                <p className="text-xl font-bold text-foreground">
+                  👋 Hey there!
+                </p>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  I'm your AI productivity coach. Ask me anything about your quests, goals, or how to stay productive.
+                </p>
+                <div className="text-xs text-muted-foreground/70 max-w-md mx-auto pt-2">
+                  Level {player.level} • {player.stats.questsCompleted || 0} quests • {player.streak || 0} day streak
+                </div>
                 </div>
                 <div className="flex flex-col gap-3 max-w-md mx-auto">
                   <Button
@@ -382,12 +382,10 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Lightbulb className="w-5 h-5 text-primary" />
-                      </div>
+                      <Lightbulb className="w-5 h-5 text-primary" />
                       <div className="text-left">
-                        <div className="font-semibold">✨ Smart Quest Suggestions</div>
-                        <div className="text-xs text-muted-foreground">AI-powered quest ideas based on your profile</div>
+                        <div className="font-semibold text-sm">Suggest Quests</div>
+                        <div className="text-xs text-muted-foreground">Get personalized quest ideas</div>
                       </div>
                     </div>
                   </Button>
@@ -398,12 +396,10 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading || activeQuests.length === 0}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-accent/10">
-                        <ListChecks className="w-5 h-5 text-accent" />
-                      </div>
+                      <ListChecks className="w-5 h-5 text-accent" />
                       <div className="text-left">
-                        <div className="font-semibold">📋 Strategic Quest Review</div>
-                        <div className="text-xs text-muted-foreground">Get portfolio analysis & prioritization</div>
+                        <div className="font-semibold text-sm">Review Quests</div>
+                        <div className="text-xs text-muted-foreground">Analyze & prioritize your tasks</div>
                       </div>
                     </div>
                   </Button>
@@ -414,12 +410,10 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     disabled={isLoading || activeQuests.length === 0}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gold/10">
-                        <Sparkles className="w-5 h-5 text-gold" />
-                      </div>
+                      <Sparkles className="w-5 h-5 text-gold" />
                       <div className="text-left">
-                        <div className="font-semibold">🎯 Priority Advisor</div>
-                        <div className="text-xs text-muted-foreground">Data-driven next-quest recommendation</div>
+                        <div className="font-semibold text-sm">What's Next?</div>
+                        <div className="text-xs text-muted-foreground">Quick recommendation on what to do</div>
                       </div>
                     </div>
                   </Button>
