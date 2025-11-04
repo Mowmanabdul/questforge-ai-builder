@@ -6,7 +6,9 @@ import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
 import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
 import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
 import { AICoachChat } from "@/components/quest/AICoachChat";
-import { DashboardStats } from "@/components/quest/DashboardStats";
+import { OptimizedDashboard } from "@/components/quest/OptimizedDashboard";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { MobileBottomNav } from "@/components/quest/MobileBottomNav";
 import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
@@ -564,7 +566,11 @@ const Index = () => {
             ) : (
               <div className="space-y-6">
                 <DailyWisdom />
-                <DashboardStats player={player} />
+                <OptimizedDashboard 
+                  player={player} 
+                  quests={quests}
+                  dailyFocus={dailyFocus}
+                />
                 <ImprovedAnalytics player={player} />
               </div>
             )}
@@ -693,6 +699,9 @@ const Index = () => {
             </div>
           </div>
         </div>
+
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Edit Quest Dialog */}
         {editingQuest && (
