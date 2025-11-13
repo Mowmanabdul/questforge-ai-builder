@@ -61,6 +61,10 @@ export default {
         leisure: "hsl(var(--leisure))",
         insight: "hsl(var(--insight))",
         "xp-bar": "hsl(var(--xp-bar))",
+        purple: {
+          400: "hsl(280 80% 70%)",
+          500: "hsl(280 80% 60%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

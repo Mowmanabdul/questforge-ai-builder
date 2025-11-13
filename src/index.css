@@ -6,72 +6,74 @@
 
 @layer base {
   :root {
-    /* Enhanced Dark Base */
-    --background: 240 12% 5%;
-    --foreground: 240 8% 98%;
+    /* Premium Dark Base */
+    --background: 222 28% 7%;
+    --foreground: 210 40% 98%;
 
-    /* Elevated Surfaces with Better Contrast */
-    --card: 240 10% 11%;
-    --card-foreground: 240 8% 98%;
+    /* Elevated Surfaces */
+    --card: 222 26% 11%;
+    --card-foreground: 210 40% 98%;
     
-    --popover: 240 10% 11%;
-    --popover-foreground: 240 8% 98%;
+    --popover: 222 26% 11%;
+    --popover-foreground: 210 40% 98%;
 
     /* Vibrant Purple Primary */
-    --primary: 267 85% 66%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 267 100% 78%;
-    --primary-dark: 267 85% 50%;
+    --primary: 270 75% 65%;
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 270 80% 75%;
+    --primary-dark: 270 75% 50%;
 
-    /* Warm Gold Accent */
+    /* Warm Gold Secondary */
     --secondary: 43 96% 58%;
-    --secondary-foreground: 240 10% 8%;
+    --secondary-foreground: 222 28% 7%;
     --secondary-glow: 43 100% 70%;
 
-    /* Improved Muted with Better Contrast */
-    --muted: 240 8% 16%;
-    --muted-foreground: 240 6% 65%;
+    /* Refined Muted */
+    --muted: 217 35% 18%;
+    --muted-foreground: 215 20% 70%;
 
-    /* Fresh Success Green */
+    /* Fresh Green Accent */
     --accent: 142 72% 48%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 210 40% 98%;
     --accent-glow: 142 80% 65%;
 
     /* Alert Red */
-    --destructive: 0 73% 54%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 65% 58%;
+    --destructive-foreground: 210 40% 98%;
 
     /* Enhanced Borders */
-    --border: 240 8% 22%;
-    --input: 240 8% 19%;
-    --ring: 267 85% 66%;
+    --border: 217 35% 18%;
+    --input: 217 35% 18%;
+    --ring: 270 75% 65%;
 
     /* Special Colors */
-    --xp-bar: 267 85% 66%;
+    --xp-bar: 270 75% 65%;
     --gold: 43 96% 58%;
     --leisure: 330 82% 62%;
     --insight: 190 96% 58%;
 
     --radius: 0.75rem;
 
-    /* Enhanced Glass Effects */
-    --glass-bg: 240 10% 11% / 0.75;
-    --glass-border: 240 10% 30% / 0.25;
+    /* Premium Glass Effects */
+    --glass-bg: 222 26% 11% / 0.8;
+    --glass-border: 217 35% 25% / 0.3;
     
-    /* Enhanced Shadows with Color */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 28px hsl(var(--primary) / 0.4);
-    --shadow-secondary-glow: 0 0 28px hsl(var(--secondary) / 0.35);
-    --shadow-accent-glow: 0 0 28px hsl(var(--accent) / 0.35);
+    /* Premium Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.18);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.24);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 32px rgba(167, 139, 250, 0.4);
+    --shadow-glow-strong: 0 0 48px rgba(167, 139, 250, 0.6);
+    --shadow-secondary-glow: 0 0 32px rgba(251, 191, 36, 0.35);
+    --shadow-accent-glow: 0 0 32px rgba(34, 197, 94, 0.35);
     
     /* Smooth Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    /* Safe area insets for mobile devices */
+    /* Safe area insets */
     --safe-area-inset-top: env(safe-area-inset-top);
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
     --safe-area-inset-left: env(safe-area-inset-left);
@@ -86,10 +88,10 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: radial-gradient(ellipse at top, hsl(267 85% 14%) 0%, hsl(240 12% 5%) 50%);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, hsl(222 28% 7%) 0%, hsl(217 35% 9%) 50%, hsl(222 28% 7%) 100%);
     background-attachment: fixed;
-    transition: background 0.5s ease;
+    transition: var(--transition-slow);
   }
 
   /* Scrollbar Styling */
@@ -112,13 +114,13 @@
 }
 
 @layer utilities {
-  /* Enhanced Glass Card */
+  /* Premium Glass Card */
   .glass-card {
-    background: hsl(var(--card) / 0.75);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-md), inset 0 1px 0 hsl(var(--border) / 0.1);
-    transition: var(--transition-smooth);
+    background: linear-gradient(135deg, hsl(222 26% 13%) 0%, hsl(222 26% 11%) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
   }
 
   /* Enhanced Glow Effects */
@@ -207,20 +209,20 @@
     box-shadow: 0 0 10px hsl(var(--xp-bar) / 0.6), inset 0 0 10px hsl(var(--xp-bar) / 0.3);
   }
 
-  /* Enhanced Card Hover with Spring Animation */
+  /* Premium Card Hover */
   .card-hover {
-    transition: var(--transition-smooth);
+    transition: var(--transition);
     position: relative;
   }
 
   .card-hover:hover {
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: var(--shadow-lg), 0 0 36px hsl(var(--primary) / 0.3);
-    border-color: hsl(var(--primary) / 0.4);
+    transform: scale(1.02);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: hsl(var(--primary) / 0.3);
   }
 
   .card-hover:active {
-    transform: translateY(-1px) scale(1.005);
+    transform: scale(1.01);
     transition: all 0.1s ease;
   }
 
