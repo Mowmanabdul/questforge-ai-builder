@@ -154,6 +154,31 @@
     }
   }
 
+  /* Smooth Fade Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth Transitions for Tab Content */
+  .transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .duration-300 {
+    transition-duration: 300ms;
+  }
+
   /* Level Up Animation */
   @keyframes levelUp {
     0% {

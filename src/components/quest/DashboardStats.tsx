@@ -13,7 +13,7 @@ export const DashboardStats = ({ player }: DashboardStatsProps) => {
   const xpNeeded = player.xpToNext - player.xp;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       {/* Hero Card - Player Info */}
       <Card className="glass-card border-primary/30 overflow-hidden relative group">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-purple-500/10 to-transparent pointer-events-none" />
