@@ -9,7 +9,7 @@ import { AICoachChat } from "@/components/quest/AICoachChat";
 import { OptimizedDashboard } from "@/components/quest/OptimizedDashboard";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { MobileBottomNav } from "@/components/quest/MobileBottomNav";
-import { ImprovedAnalytics } from "@/components/quest/ImprovedAnalytics";
+import { EnhancedAnalytics } from "@/components/quest/EnhancedAnalytics";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
@@ -587,7 +587,7 @@ const Index = () => {
                   quests={quests}
                   dailyFocus={dailyFocus}
                 />
-                <ImprovedAnalytics player={player} />
+                <EnhancedAnalytics player={player} />
               </div>
             )}
           </TabsContent>
