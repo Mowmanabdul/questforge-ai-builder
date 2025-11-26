@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { CustomReward } from "@/hooks/useGameState";
 import { z } from "zod";
-import { ChevronDown } from "lucide-react";
 
 interface ImprovedRewardsProps {
   gold: number;
@@ -52,7 +51,6 @@ export const ImprovedRewards = ({
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<CustomReward | null>(null);
-  const [showRecentClaims, setShowRecentClaims] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -153,76 +151,41 @@ export const ImprovedRewards = ({
   })).filter(cat => cat.rewards.length > 0);
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Stats Grid - 3 Column */}
-      <div className="grid grid-cols-3 gap-3">
-        {/* Gold Balance */}
-        <Card className="glass-card border-gold/30 hover:border-gold/50 transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-gold/20 to-yellow-500/20 border border-gold/30">
-                <Coins className="w-6 h-6 text-gold" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{gold}</p>
-                <p className="text-xs text-muted-foreground">Available Gold</p>
-              </div>
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <Card className="glass-card border-leisure/30">
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <CardTitle className="text-3xl flex items-center gap-3">
+                <Sparkles className="w-8 h-8 text-leisure" />
+                Your Rewards
+              </CardTitle>
+              <CardDescription className="text-base mt-2">
+                Create and claim rewards that motivate you
+              </CardDescription>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Spent */}
-        <Card className="glass-card border-primary/30 hover:border-primary/50 transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30">
-                <Sparkles className="w-6 h-6 text-primary" />
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <div className="flex items-center gap-2 text-2xl font-bold text-gold">
+                  <Coins className="w-6 h-6" />
+                  {gold}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {totalSpent} spent total
+                </p>
               </div>
-              <div>
-                <p className="text-2xl font-bold">{totalSpent}</p>
-                <p className="text-xs text-muted-foreground">Total Spent</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Claims Count */}
-        <Card className="glass-card border-accent/30 hover:border-accent/50 transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/30">
-                <ShoppingBag className="w-6 h-6 text-accent" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{leisureHistory.length}</p>
-                <p className="text-xs text-muted-foreground">Total Claims</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Add Reward Section */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h2 className="text-base font-semibold">Your Rewards</h2>
-          <p className="text-sm text-muted-foreground">Create and claim personalized rewards</p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) resetForm();
-        }}>
-          <DialogTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="gap-2 glass-card border-border/40 hover:border-primary/40 bg-card/50 hover:bg-card/70 flex-shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              Add Reward
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md glass-card">
+              <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                if (!open) resetForm();
+              }}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="gap-2">
+                    <Plus className="w-5 h-5" />
+                    Add Reward
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle>{editingReward ? 'Edit' : 'Create'} Reward</DialogTitle>
                     <DialogDescription>
@@ -300,142 +263,135 @@ export const ImprovedRewards = ({
                     </Button>
                   </div>
                 </DialogContent>
-        </Dialog>
-      </div>
+              </Dialog>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Rewards by Category */}
       {groupedRewards.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {groupedRewards.map(category => {
             const Icon = category.icon;
             return (
-              <div key={category.value}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1.5 rounded-lg" style={{ backgroundColor: `${category.color}20`, borderColor: `${category.color}40`, borderWidth: '1px' }}>
-                    <Icon className="w-4 h-4" style={{ color: category.color }} />
-                  </div>
-                  <h3 className="text-sm font-semibold">{category.label}</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {category.rewards.map((reward) => {
+              <Card key={category.value} className="glass-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Icon className="w-5 h-5" style={{ color: category.color }} />
+                    {category.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {category.rewards.map((reward) => {
                       const canAfford = gold >= reward.cost;
                       return (
                         <Card 
                           key={reward.id} 
-                          className={`glass-card transition-all duration-300 ${
+                          className={`border-2 transition-all duration-300 ${
                             canAfford 
-                              ? 'border-gold/40 hover:border-gold hover:shadow-lg hover:shadow-gold/10' 
-                              : 'border-border/30 opacity-70'
+                              ? 'border-leisure/40 hover:border-leisure hover:glow-leisure' 
+                              : 'border-border/30 opacity-75'
                           }`}
                         >
-                          <CardContent className="p-3">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="p-2 rounded-lg bg-muted/30 border border-border/30 flex-shrink-0">
-                                <span className="text-lg">{reward.emoji}</span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold line-clamp-1">{reward.name}</p>
-                                <p className="text-xs text-muted-foreground line-clamp-1">{reward.description}</p>
-                              </div>
-                              <div className="flex gap-1 flex-shrink-0">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <CardTitle className="text-lg flex items-center gap-2 flex-1">
+                                <span className="text-2xl">{reward.emoji}</span>
+                                <span className="line-clamp-1">{reward.name}</span>
+                              </CardTitle>
+                              <div className="flex gap-1">
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  className="h-7 w-7"
+                                  className="h-8 w-8"
                                   onClick={() => handleEdit(reward)}
                                 >
-                                  <Edit className="w-3 h-3" />
+                                  <Edit className="w-4 h-4" />
                                 </Button>
                                 <Button
                                   size="icon"
                                   variant="ghost"
-                                  className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                                  className="h-8 w-8 text-destructive"
                                   onClick={() => handleDelete(reward.id)}
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
                               </div>
                             </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5 text-sm">
-                                <Coins className="w-4 h-4 text-gold" />
-                                <span className="font-semibold">{reward.cost}</span>
-                                <span className="text-muted-foreground text-xs">Gold</span>
-                              </div>
-                              <Button
-                                onClick={() => handlePurchase(reward)}
-                                disabled={!canAfford}
-                                size="sm"
-                                className="h-7 px-3 text-xs"
-                                variant={canAfford ? "default" : "outline"}
-                              >
-                                {canAfford ? 'Claim' : `Need ${reward.cost - gold} more`}
-                              </Button>
-                            </div>
+                            <CardDescription className="text-xs line-clamp-2">
+                              {reward.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <Button
+                              onClick={() => handlePurchase(reward)}
+                              disabled={!canAfford}
+                              className="w-full"
+                              variant={canAfford ? "default" : "outline"}
+                            >
+                              <Coins className="w-4 h-4 mr-2" />
+                              {reward.cost} Gold
+                            </Button>
+                            {!canAfford && (
+                              <p className="text-xs text-center text-muted-foreground">
+                                Need {reward.cost - gold} more gold
+                              </p>
+                            )}
                           </CardContent>
                         </Card>
                       );
                     })}
-                </div>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
       ) : (
         <Card className="glass-card">
           <CardContent className="py-12 text-center">
-            <div className="p-4 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-primary" />
-            </div>
+            <Sparkles className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No rewards yet</h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground">
               Click the "Add Reward" button above to create your first reward!
             </p>
           </CardContent>
         </Card>
       )}
-      {/* Purchase History - Collapsible */}
+
+      {/* Purchase History */}
       {leisureHistory.length > 0 && (
-        <div>
-          <button
-            onClick={() => setShowRecentClaims(!showRecentClaims)}
-            className="w-full flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-card/50 transition-all group"
-          >
-            <div className="flex items-center gap-2">
-              <div className="p-1 rounded-lg bg-primary/10 border border-primary/30 group-hover:bg-primary/20 transition-colors">
-                <ShoppingBag className="w-3 h-3 text-primary" />
-              </div>
-              <h3 className="text-xs font-semibold">Recent Claims ({leisureHistory.length})</h3>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showRecentClaims ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {showRecentClaims && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2 animate-in slide-in-from-top-2 duration-300">
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-xl">Recent Claims</CardTitle>
+            <CardDescription>Your latest reward purchases</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
               {leisureHistory.slice(0, 8).map((item, idx) => (
-                <Card 
+                <div 
                   key={idx}
-                  className="glass-card hover:border-primary/30 transition-all duration-300"
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
                 >
-                  <CardContent className="p-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-xs truncate">{item.activityName}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-0.5 text-gold flex-shrink-0">
-                        <Coins className="w-2.5 h-2.5" />
-                        <span className="text-xs font-semibold">{item.cost}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className="text-leisure border-leisure/50">
+                      {item.activityName}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(item.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-gold flex items-center gap-1">
+                    <Coins className="w-3 h-3" />
+                    {item.cost}
+                  </span>
+                </div>
               ))}
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

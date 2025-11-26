@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { OracleMessage } from "@/components/quest/OracleMessage";
-import { EnhancedQuestList } from "@/components/quest/EnhancedQuestList";
-import { EnhancedAddQuestForm } from "@/components/quest/EnhancedAddQuestForm";
+import { CleanQuestInterface } from "@/components/quest/CleanQuestInterface";
+import { AddQuestModal } from "@/components/quest/AddQuestModal";
 import { EditQuestDialog } from "@/components/quest/EditQuestDialog";
-import { CompletedQuestsArchive } from "@/components/quest/CompletedQuestsArchive";
+import { ModernArchive } from "@/components/quest/ModernArchive";
 import { AICoachChat } from "@/components/quest/AICoachChat";
-import { OptimizedDashboard } from "@/components/quest/OptimizedDashboard";
+import { FlowingAnalytics } from "@/components/quest/FlowingAnalytics";
+import { ModernHeader } from "@/components/quest/ModernHeader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { MobileBottomNav } from "@/components/quest/MobileBottomNav";
-import { EnhancedAnalytics } from "@/components/quest/EnhancedAnalytics";
+import { ImprovedMobileNav } from "@/components/quest/ImprovedMobileNav";
+import { EnhancedDashboard } from "@/components/quest/EnhancedDashboard";
 import { DailyWisdom } from "@/components/quest/motivation/DailyWisdom";
 import { ProactiveCoach } from "@/components/quest/ProactiveCoach";
 import { ImprovedRewards } from "@/components/quest/ImprovedRewards";
@@ -31,6 +32,7 @@ import { exportToJSON, exportToCSV } from "@/utils/dataExport";
 import { Quest } from "@/hooks/useGameState";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { initializeTheme } from "@/utils/themeConfig";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -43,6 +45,13 @@ const Index = () => {
   const [deleteConfirmQuest, setDeleteConfirmQuest] = useState<string | null>(null);
   const [aiCoachQuestContext, setAiCoachQuestContext] = useState<Quest | undefined>();
   const [activeTab, setActiveTab] = useState<string>("home");
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [addQuestModalOpen, setAddQuestModalOpen] = useState<boolean>(false);
+
+  // Initialize theme on mount
+  useEffect(() => {
+    initializeTheme();
+  }, []);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -466,74 +475,72 @@ const Index = () => {
         onExportData={() => exportToJSON(player, quests)}
       />
       <div className="max-w-7xl mx-auto">
-        {/* Header with Settings */}
-        <header className="text-center mb-6 sm:mb-8 animate-fade-in">
-          <div className="flex justify-between items-center mb-3 sm:mb-4">
-            <div />
-            <div className="flex gap-2">
-              <KeyboardShortcutsHelp />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={signOut}
-                className="glass-card border-primary/20 hover:border-destructive/40 transition-all"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Button>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    className="glass-card border-primary/20 hover:border-primary/40 transition-all"
-                  >
-                    <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-                  <SheetHeader className="mb-6">
-                    <SheetTitle className="flex items-center gap-2 text-2xl">
-                      <SettingsIcon className="w-6 h-6" />
-                      Settings
-                    </SheetTitle>
-                  </SheetHeader>
-                  <Settings 
-                    onResetData={resetAll}
-                    onExportJSON={() => exportToJSON(player, quests)}
-                    onExportCSV={() => exportToCSV(player, quests)}
-                  />
-                </SheetContent>
-              </Sheet>
+        {/* Simple Navigation Header - Only for non-home tabs */}
+        {activeTab !== 'home' && (
+          <header className="text-center mb-6 sm:mb-8 animate-fade-in">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <div />
+              <div className="flex gap-2">
+                <KeyboardShortcutsHelp />
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={signOut}
+                  className="glass-card border-primary/20 hover:border-destructive/40 transition-all"
+                  title="Sign Out"
+                >
+                  <LogOut className="icon-sm sm:icon-md" />
+                </Button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="glass-card border-primary/20 hover:border-primary/40 transition-all"
+                    >
+                      <SettingsIcon className="icon-sm sm:icon-md" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+                    <SheetHeader className="mb-6">
+                      <SheetTitle className="flex items-center gap-2 text-2xl">
+                        <SettingsIcon className="w-6 h-6" />
+                        Settings
+                      </SheetTitle>
+                    </SheetHeader>
+                    <Settings 
+                      onResetData={resetAll}
+                      onExportJSON={() => exportToJSON(player, quests)}
+                      onExportCSV={() => exportToCSV(player, quests)}
+                    />
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
-          </div>
-          
-          <div className="relative">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-primary via-leisure to-insight bg-clip-text text-transparent animate-fade-in">
-              QuestLog
-            </h1>
+            
             {player.prestigeLevel > 0 && (
-              <div className="absolute -top-2 -right-2 px-3 py-1 bg-gradient-to-r from-secondary to-gold rounded-full border border-secondary/50 animate-pulse">
-                <span className="text-xs font-bold text-secondary-foreground">
-                  Prestige {player.prestigeLevel}
-                </span>
+              <div className="flex justify-center">
+                <div className="px-3 py-1 bg-gradient-to-r from-secondary to-gold rounded-full border border-secondary/50 animate-pulse">
+                  <span className="text-sm font-bold text-secondary-foreground">
+                    Prestige Level {player.prestigeLevel}
+                  </span>
+                </div>
               </div>
             )}
-          </div>
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Gamify your life, one quest at a time ⚔️
-          </p>
-        </header>
+          </header>
+        )}
 
-        {/* Oracle Message */}
-        {oracleMessage && <OracleMessage message={oracleMessage} />}
+        {/* Oracle Message - Only on home */}
+        {activeTab === 'home' && oracleMessage && <OracleMessage message={oracleMessage} />}
         
-        {/* Proactive AI Coach */}
-        <ProactiveCoach 
-          player={player} 
-          activeQuests={quests}
-          onNavigateToCoach={() => setActiveTab('coach')}
-        />
+        {/* Proactive AI Coach - Only on home */}
+        {activeTab === 'home' && (
+          <ProactiveCoach 
+            player={player} 
+            activeQuests={quests}
+            onNavigateToCoach={() => setActiveTab('coach')}
+          />
+        )}
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -543,36 +550,36 @@ const Index = () => {
               value="home" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
-              <Home className="w-4 h-4" />
+              <Home className="icon-sm" />
               <span>Home</span>
             </TabsTrigger>
             <TabsTrigger 
               value="quests" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
-              <Target className="w-4 h-4" />
+              <Target className="icon-sm" />
               <span>Quests</span>
             </TabsTrigger>
             <TabsTrigger 
               value="archive" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
-              <ArchiveIcon className="w-4 h-4" />
+              <ArchiveIcon className="icon-sm" />
               <span>Archive</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="coach" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>AI Coach</span>
             </TabsTrigger>
             <TabsTrigger 
               value="rewards" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
             >
-              <Gift className="w-4 h-4" />
+              <Gift className="icon-sm" />
               <span>Rewards</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="coach" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all hover:bg-primary/10"
+            >
+              <Sparkles className="icon-sm" />
+              <span>AI Coach</span>
             </TabsTrigger>
           </TabsList>
 
@@ -581,38 +588,34 @@ const Index = () => {
               <DashboardSkeleton />
             ) : (
               <div className="space-y-6">
-                <DailyWisdom />
-                <OptimizedDashboard 
-                  player={player} 
+                {/* Modern Header - Only on Home */}
+                <ModernHeader
+                  player={player}
                   quests={quests}
-                  dailyFocus={dailyFocus}
+                  onSettingsClick={() => {}} // Will implement settings integration
+                  activeTab={activeTab}
                 />
-                <EnhancedAnalytics player={player} />
+                
+                <DailyWisdom />
+                <FlowingAnalytics 
+                  player={player} 
+                />
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="quests" className="space-y-6">
             {quests.length === 0 && !dataLoading ? (
-              <EmptyStateGuide onGetStarted={() => document.getElementById('questName')?.focus()} />
+              <EmptyStateGuide onGetStarted={() => setAddQuestModalOpen(true)} />
             ) : null}
-            <EnhancedAddQuestForm onAddQuest={addQuest} />
             {dataLoading ? (
               <QuestListSkeleton />
             ) : (
-              <EnhancedQuestList 
+              <CleanQuestInterface 
                 quests={quests} 
                 dailyFocus={dailyFocus}
                 onCompleteQuest={completeQuest}
-                onDeleteQuest={handleDeleteQuest}
-                onEditQuest={handleEditQuest}
-                onAskAICoach={handleAskAICoach}
-                onRushQuest={handleRushQuest}
-                dailyRushUsed={player.dailyRushUsed}
-                chronoLevel={player.homestead.find(b => b.id === 'chrono')?.level || 0}
-                selectedQuests={selectedQuests}
-                onSelectQuest={handleSelectQuest}
-                onBulkComplete={handleBulkComplete}
+                onAddQuest={() => setAddQuestModalOpen(true)}
               />
             )}
           </TabsContent>
@@ -621,7 +624,7 @@ const Index = () => {
             {dataLoading ? (
               <QuestListSkeleton />
             ) : (
-              <CompletedQuestsArchive
+              <ModernArchive
                 quests={completedQuests}
                 onRestore={restoreQuest}
                 onPermanentDelete={permanentDeleteQuest}
@@ -653,71 +656,8 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Mobile Bottom Navigation - Fixed at bottom */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
-          <div className="glass-card border-t border-primary/20 px-2 py-3">
-            <div className="flex justify-around items-center max-w-lg mx-auto">
-              <button
-                onClick={() => setActiveTab('home')}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                  activeTab === 'home' 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <Home className="w-5 h-5" />
-                <span className="text-xs font-medium">Home</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('quests')}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                  activeTab === 'quests' 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <Target className="w-5 h-5" />
-                <span className="text-xs font-medium">Quests</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('archive')}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                  activeTab === 'archive' 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <ArchiveIcon className="w-5 h-5" />
-                <span className="text-xs font-medium">Archive</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('coach')}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                  activeTab === 'coach' 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <Sparkles className="w-5 h-5" />
-                <span className="text-xs font-medium">Coach</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('rewards')}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all ${
-                  activeTab === 'rewards' 
-                    ? 'bg-primary text-primary-foreground scale-110' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                <Gift className="w-5 h-5" />
-                <span className="text-xs font-medium">Rewards</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Bottom Navigation */}
-        <MobileBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+        {/* Improved Mobile Navigation */}
+        <ImprovedMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Edit Quest Dialog */}
         {editingQuest && (
@@ -730,6 +670,30 @@ const Index = () => {
             onRequestAIBreakdown={handleRequestAIBreakdown}
           />
         )}
+
+        {/* Add Quest Modal */}
+        <AddQuestModal 
+          open={addQuestModalOpen}
+          onOpenChange={setAddQuestModalOpen}
+          onAddQuest={addQuest}
+        />
+
+        {/* Settings Sheet */}
+        <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="flex items-center gap-2 text-2xl">
+                <SettingsIcon className="w-6 h-6" />
+                Settings
+              </SheetTitle>
+            </SheetHeader>
+            <Settings 
+              onResetData={resetAll}
+              onExportJSON={() => exportToJSON(player, quests)}
+              onExportCSV={() => exportToCSV(player, quests)}
+            />
+          </SheetContent>
+        </Sheet>
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={!!deleteConfirmQuest} onOpenChange={(open) => !open && setDeleteConfirmQuest(null)}>

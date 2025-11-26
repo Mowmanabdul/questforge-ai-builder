@@ -12,30 +12,58 @@
 
     /* Elevated Surfaces */
     --card: 222 26% 11%;
-    --card-foreground: 210 40% 98%;
+    --card-fore  /* Enhanced Card Hover with Smooth Scaling */
+  .card-hover {
+    transition: var(--transition);
+    position: relative;
+    transform-origin: center;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: hsl(var(--primary) / 0.4);
+  }
+
+  .card-hover:active {
+    transform: translateY(-2px) scale(1.005);
+    transition: all 0.15s ease-out;
+  }
+
+  /* Subtle grid pattern for cards */
+  .bg-grid-white\/\[0\.02\] {
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
     
     --popover: 222 26% 11%;
     --popover-foreground: 210 40% 98%;
 
-    /* Vibrant Purple Primary */
+    /* Enhanced Purple Primary */
     --primary: 270 75% 65%;
     --primary-foreground: 210 40% 98%;
     --primary-glow: 270 80% 75%;
     --primary-dark: 270 75% 50%;
+    --primary-light: 270 75% 80%;
 
-    /* Warm Gold Secondary */
+    /* Rich Gold Secondary */
     --secondary: 43 96% 58%;
     --secondary-foreground: 222 28% 7%;
     --secondary-glow: 43 100% 70%;
+    --gold: 43 96% 58%;
+    --gold-light: 43 96% 70%;
 
-    /* Refined Muted */
+    /* Refined Muted with Better Contrast */
     --muted: 217 35% 18%;
-    --muted-foreground: 215 20% 70%;
+    --muted-foreground: 215 25% 75%;
 
-    /* Fresh Green Accent */
-    --accent: 142 72% 48%;
+    /* Vibrant Green Accent */
+    --accent: 142 72% 55%;
     --accent-foreground: 210 40% 98%;
     --accent-glow: 142 80% 65%;
+    --accent-light: 142 72% 75%;
 
     /* Alert Red */
     --destructive: 0 65% 58%;
@@ -121,6 +149,70 @@
     border: 1px solid hsl(var(--border) / 0.6);
     box-shadow: var(--shadow-md);
     transition: var(--transition);
+  }
+
+  /* Standardized Card Variants */
+  .card-default {
+    background: linear-gradient(135deg, hsl(222 26% 13%) 0%, hsl(222 26% 11%) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-default {
+      padding: 1.5rem;
+    }
+  }
+
+  .card-compact {
+    background: linear-gradient(135deg, hsl(222 26% 13%) 0%, hsl(222 26% 11%) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    padding: 0.75rem;
+    border-radius: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-compact {
+      padding: 1rem;
+    }
+  }
+
+  .card-mobile {
+    background: linear-gradient(135deg, hsl(222 26% 13%) 0%, hsl(222 26% 11%) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    padding: 0.75rem;
+    border-radius: 1rem;
+  }
+
+  /* Standardized Icon Sizes */
+  .icon-sm {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .icon-md {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .icon-lg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .icon-xl {
+    width: 2rem;
+    height: 2rem;
   }
 
   /* Enhanced Glow Effects */
@@ -234,21 +326,51 @@
     box-shadow: 0 0 10px hsl(var(--xp-bar) / 0.6), inset 0 0 10px hsl(var(--xp-bar) / 0.3);
   }
 
-  /* Premium Card Hover */
+  /* Enhanced Card Hover with Smooth Scaling */
   .card-hover {
-    transition: var(--transition);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    transform-origin: center;
   }
 
   .card-hover:hover {
-    transform: scale(1.02);
+    transform: translateY(-4px) scale(1.015);
     box-shadow: var(--shadow-xl), var(--shadow-glow);
-    border-color: hsl(var(--primary) / 0.3);
+    border-color: hsl(var(--primary) / 0.4);
   }
 
   .card-hover:active {
-    transform: scale(1.01);
-    transition: all 0.1s ease;
+    transform: translateY(-2px) scale(1.005);
+    transition: all 0.15s ease-out;
+  }
+
+  /* Smooth Hover Scale for Buttons */
+  .hover-scale-smooth {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-scale-smooth:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-scale-smooth:active {
+    transform: scale(0.98);
+  }
+
+  /* Icon Pulse Animation */
+  @keyframes iconPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+
+  .animate-icon-pulse {
+    animation: iconPulse 2s ease-in-out infinite;
   }
 
   /* Mobile Optimizations */

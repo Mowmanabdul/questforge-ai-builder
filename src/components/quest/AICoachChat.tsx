@@ -36,13 +36,15 @@ interface AICoachChatProps {
   onAddQuest?: (quest: Omit<Quest, 'id' | 'completed' | 'completedAt' | 'createdAt'>) => void;
   onClearContext?: () => void;
   onUpdateQuest?: (questId: string, updates: Partial<Quest>) => void;
+  onSettingsClick?: () => void;
 }
 
-export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, onClearContext, onUpdateQuest }: AICoachChatProps) => {
+export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, onClearContext, onUpdateQuest, onSettingsClick }: AICoachChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Load conversation history from localStorage
@@ -82,11 +84,10 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
     }
   }, [questContext]);
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
 
   const streamChat = async (userMessage: string, requestType?: string, breakdownQuest?: Quest) => {
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
@@ -315,46 +316,47 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
   };
 
   return (
-    <Card className="glass-card border-primary/40 glow-primary h-[calc(100vh-12rem)] md:h-[650px] flex flex-col overflow-hidden">
-      <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5 py-3 md:py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-              </div>
-              <div>
-                <CardTitle className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  AI Productivity Coach
-                </CardTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Your strategic quest advisor</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              {messages.length > 0 && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  onClick={handleResetConversation}
-                  className="hover:bg-destructive/10 hover:text-destructive"
-                  title="Reset conversation"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </Button>
-              )}
-              {questContext && onClearContext && (
-                <Button size="sm" variant="ghost" onClick={onClearContext} className="hover:bg-primary/10">
-                  Clear Context
-                </Button>
-              )}
+    <div className="space-y-4">
+      {/* Conditional Quest Context Bar */}
+      {questContext && onClearContext && (
+        <Card className="glass-card border-primary/30 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-sm font-medium">Discussing: {questContext.name}</p>
+              <p className="text-xs text-muted-foreground">{questContext.category} • {questContext.xp} XP</p>
             </div>
           </div>
-        {questContext && (
-          <Badge variant="outline" className="mt-3 border-primary/30 bg-primary/5">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Discussing: {questContext.name}
-          </Badge>
-        )}
-      </CardHeader>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={onClearContext}
+            className="hover:bg-primary/10"
+          >
+            Clear Context
+          </Button>
+        </Card>
+      )}
+
+      {/* Chat Interface */}
+      <Card className="glass-card border-primary/40 glow-primary h-[calc(100vh-12rem)] md:h-[650px] flex flex-col overflow-hidden">
+        <CardHeader className="border-b border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5 py-3 px-4 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">AI Coach</span>
+          </div>
+          {messages.length > 0 && (
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={handleResetConversation}
+              className="h-7 px-2 hover:bg-destructive/10 hover:text-destructive"
+              title="Reset conversation"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </Button>
+          )}
+        </CardHeader>
       <CardContent className="flex-1 flex flex-col gap-4 min-h-0 p-3 md:p-6">
         <ScrollArea className="flex-1 pr-2 md:pr-4" ref={scrollRef}>
           <div className="space-y-4">
@@ -365,13 +367,13 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                 </div>
                 <div className="space-y-2">
                 <p className="text-xl font-bold text-foreground">
-                  👋 Hey there!
+                  👋 Hey there, Champion!
                 </p>
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  I'm your AI productivity coach. Ask me anything about your quests, goals, or how to stay productive.
+                  I'm your AI productivity coach. I can help you create quests, prioritize tasks, and stay motivated.
                 </p>
                 <div className="text-xs text-muted-foreground/70 max-w-md mx-auto pt-2">
-                  Level {player.level} • {player.stats.questsCompleted || 0} quests • {player.streak || 0} day streak
+                  Level {player.level} • {player.stats.questsCompleted || 0} completed • {player.streak || 0} day streak
                 </div>
                 </div>
                 <div className="flex flex-col gap-3 max-w-md mx-auto">
@@ -384,39 +386,43 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                     <div className="flex items-center gap-3">
                       <Lightbulb className="w-5 h-5 text-primary" />
                       <div className="text-left">
-                        <div className="font-semibold text-sm">Suggest Quests</div>
-                        <div className="text-xs text-muted-foreground">Get personalized quest ideas</div>
+                        <div className="font-semibold text-sm">Suggest New Quests</div>
+                        <div className="text-xs text-muted-foreground">Get personalized quest ideas based on your goals</div>
                       </div>
                     </div>
                   </Button>
-                  <Button
-                    onClick={() => handleSpecialRequest('review')}
-                    variant="outline"
-                    className="w-full glass-card border-accent/30 hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 h-auto py-4"
-                    disabled={isLoading || activeQuests.length === 0}
-                  >
-                    <div className="flex items-center gap-3">
-                      <ListChecks className="w-5 h-5 text-accent" />
-                      <div className="text-left">
-                        <div className="font-semibold text-sm">Review Quests</div>
-                        <div className="text-xs text-muted-foreground">Analyze & prioritize your tasks</div>
-                      </div>
-                    </div>
-                  </Button>
-                  <Button
-                    onClick={() => handleSpecialRequest('smart_reminder')}
-                    variant="outline"
-                    className="w-full glass-card border-gold/30 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300 h-auto py-4"
-                    disabled={isLoading || activeQuests.length === 0}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Sparkles className="w-5 h-5 text-gold" />
-                      <div className="text-left">
-                        <div className="font-semibold text-sm">What's Next?</div>
-                        <div className="text-xs text-muted-foreground">Quick recommendation on what to do</div>
-                      </div>
-                    </div>
-                  </Button>
+                  {activeQuests.length > 0 && (
+                    <>
+                      <Button
+                        onClick={() => handleSpecialRequest('review')}
+                        variant="outline"
+                        className="w-full glass-card border-accent/30 hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 h-auto py-4"
+                        disabled={isLoading}
+                      >
+                        <div className="flex items-center gap-3">
+                          <ListChecks className="w-5 h-5 text-accent" />
+                          <div className="text-left">
+                            <div className="font-semibold text-sm">Prioritize Current Quests</div>
+                            <div className="text-xs text-muted-foreground">Review and organize your active tasks</div>
+                          </div>
+                        </div>
+                      </Button>
+                      <Button
+                        onClick={() => handleSpecialRequest('smart_reminder')}
+                        variant="outline"
+                        className="w-full glass-card border-gold/30 hover:border-gold/50 hover:bg-gold/5 transition-all duration-300 h-auto py-4"
+                        disabled={isLoading}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Sparkles className="w-5 h-5 text-gold" />
+                          <div className="text-left">
+                            <div className="font-semibold text-sm">Quick Recommendation</div>
+                            <div className="text-xs text-muted-foreground">What should I focus on right now?</div>
+                          </div>
+                        </div>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -552,6 +558,8 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
                 <span>Coach is thinking...</span>
               </div>
             )}
+            {/* Invisible element to scroll to */}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
@@ -586,5 +594,6 @@ export const AICoachChat = ({ player, activeQuests, questContext, onAddQuest, on
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };
